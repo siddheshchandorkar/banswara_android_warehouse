@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +25,7 @@
         <activity android:name="com.banswara.warehouse.login.LoginActivity" />
         <activity android:name="com.banswara.warehouse.product_details.ProductDetailsActivity" />
         <activity android:name="com.banswara.warehouse.product_list.ProductListActivity" />
+        <activity android:name="com.banswara.warehouse.dashboard.DashboardActivity" />
     </application>
 
 </manifest>
