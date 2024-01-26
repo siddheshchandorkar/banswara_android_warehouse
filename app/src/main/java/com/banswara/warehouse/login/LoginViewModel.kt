@@ -9,6 +9,7 @@ class LoginViewModel {
 	val userName = MutableLiveData<String>()
 	val userNameError = MutableLiveData<String>()
 	val mobileNumber = MutableLiveData<String>()
+	val isLogin = MutableLiveData<Boolean>(true)
 	val deviceId = MutableLiveData<String>()
 	val pin = MutableLiveData<String>()
 	val events = MutableLiveData<LoginEvents>()
@@ -18,6 +19,10 @@ class LoginViewModel {
 		if(checkSignInValidations()){
 			events.value = LoginEvents.SIGN_IN
 		}
+	}
+	
+	fun createAccount(view: View){
+		isLogin.value = false
 	}
 	
 	private fun checkSignInValidations(): Boolean {

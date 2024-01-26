@@ -14,7 +14,11 @@
         android:theme="@style/Theme.BanswaraWareHouse"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivity" />
+        <activity android:name="com.banswara.warehouse.login.LoginActivity" />
+        <activity android:name="com.banswara.warehouse.product_list.ProductListActivity" />
+        <activity android:name="com.banswara.warehouse.dashboard.DashboardActivity" />
+        <activity android:name="com.banswara.warehouse.splash.SplashScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,10 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.banswara.warehouse.login.LoginActivity" />
-        <activity android:name="com.banswara.warehouse.product_details.ProductDetailsActivity" />
-        <activity android:name="com.banswara.warehouse.product_list.ProductListActivity" />
-        <activity android:name="com.banswara.warehouse.dashboard.DashboardActivity" />
     </application>
 
 </manifest>
