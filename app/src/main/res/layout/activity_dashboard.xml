@@ -35,6 +35,7 @@
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/appbar"
+            app:spanCount="4"
             app:setRowData="@{vm.challanListLiveData}" />
 
 

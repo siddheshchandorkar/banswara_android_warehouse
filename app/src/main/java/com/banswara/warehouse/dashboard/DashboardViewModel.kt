@@ -5,6 +5,6 @@ import com.banswara.warehouse.model.BaseRowModel
 
 class DashboardViewModel {
 	
-	var challanListLiveData: MutableLiveData<MutableList<BaseRowModel>> = MutableLiveData()
+	var challanListLiveData: MutableLiveData<ArrayList<BaseRowModel>> = MutableLiveData()
 	
 }

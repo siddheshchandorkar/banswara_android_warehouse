@@ -12,10 +12,11 @@ class BindingUtils {
         private const val ROW_DATA = "setRowData"
         private const val VISIBILITY = "android:visibility"
         private const val ERROR = "error"
+        private const val ON_CLICK = "onClick"
 
         @JvmStatic
         @BindingAdapter(ROW_DATA)
-        fun setRowLayoutData(recyclerView: RecyclerView, listData: List<BaseRowModel>) {
+        fun setRowLayoutData(recyclerView: RecyclerView, listData: ArrayList<BaseRowModel>) {
             if (listData == null) return
             var adapter = recyclerView.adapter
             if (adapter == null || listData.isEmpty()) {
@@ -23,7 +24,8 @@ class BindingUtils {
                 adapter.setHasStableIds(true)
                 recyclerView.adapter = adapter
             } else {
-                adapter.notifyDataSetChanged()
+                (adapter as RecyclerViewBindingAdapter ).setData(listData)
+//                adapter.notifyDataSetChanged()
             }
         }
 
