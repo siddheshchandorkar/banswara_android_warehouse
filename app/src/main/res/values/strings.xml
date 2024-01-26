@@ -12,4 +12,6 @@
     <string name="create_new_account">Create a new account</string>
     <string name="pin">PIN</string>
     <string name="don_t_have_an_account">Don’t have an account?</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="msg_sign_in_success">Your account has been\ncreated successfully!</string>
 </resources>

@@ -10,23 +10,25 @@ class LoginViewModel {
 	val userNameError = MutableLiveData<String>()
 	val mobileNumber = MutableLiveData<String>()
 	val isLogin = MutableLiveData<Boolean>(true)
+	val isSignInSuccess = MutableLiveData<Boolean>(false)
 	val deviceId = MutableLiveData<String>()
 	val pin = MutableLiveData<String>()
 	val events = MutableLiveData<LoginEvents>()
 	
 	
-	fun signIn(view: View){
-		if(checkSignInValidations()){
-			events.value = LoginEvents.SIGN_IN
+	fun signIn(view: View) {
+		if (checkSignInValidations()) {
+//			events.value = LoginEvents.SIGN_IN
+			isSignInSuccess.value = true
 		}
 	}
 	
-	fun createAccount(view: View){
+	fun createAccount(view: View) {
 		isLogin.value = false
 	}
 	
 	private fun checkSignInValidations(): Boolean {
-		if(TextUtils.isEmpty(userName.value)){
+		if (TextUtils.isEmpty(userName.value)) {
 			userNameError.value = "Please Enter User"
 			return false
 		}
@@ -34,14 +36,19 @@ class LoginViewModel {
 		return true
 	}
 	
-	fun logIn(view: View){
+	fun logIn(view: View) {
 		events.value = LoginEvents.LOGIN
 	}
 	
-	sealed class LoginEvents{
+	fun backToLogin(view: View) {
+		isLogin.value = true
+		isSignInSuccess.value = false
+	}
+	
+	sealed class LoginEvents {
 		
 		data object LOGIN : LoginEvents()
 		data object SIGN_IN : LoginEvents()
-		data class SHOW_TOAST(val message : String) : LoginEvents()
+		data class SHOW_TOAST(val message: String) : LoginEvents()
 	}
 }

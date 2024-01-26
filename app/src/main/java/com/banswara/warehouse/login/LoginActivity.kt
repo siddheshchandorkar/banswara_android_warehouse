@@ -28,8 +28,8 @@ class LoginActivity : AppCompatActivity() {
 		
 		viewModel.events.observe(this) {
 			when (it) {
-				LoginViewModel.LoginEvents.LOGIN -> TODO()
-				is LoginViewModel.LoginEvents.SHOW_TOAST -> TODO()
+				LoginViewModel.LoginEvents.LOGIN -> startActivity(Intent(this, DashboardActivity::class.java))
+				is LoginViewModel.LoginEvents.SHOW_TOAST -> Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
 				LoginViewModel.LoginEvents.SIGN_IN -> startActivity(
 					Intent(
 						this,
