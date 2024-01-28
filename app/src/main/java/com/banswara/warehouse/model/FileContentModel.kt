@@ -2,7 +2,7 @@ package com.banswara.warehouse.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ChallanFileModel(
+data class FileContentModel(
 	@SerializedName("vFileName")
 	val fileName: String, //Use to fetch files
 	@SerializedName("vFileContent")
@@ -11,6 +11,6 @@ data class ChallanFileModel(
 	val errorMsg: String
 ){
 	override fun toString(): String {
-		return fileName
+		return fileContent
 	}
 }

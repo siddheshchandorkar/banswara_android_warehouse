@@ -1,10 +1,7 @@
 package com.banswara.warehouse.network
 
 import androidx.lifecycle.MutableLiveData
-import com.banswara.warehouse.model.LoginRequestModel
-import com.banswara.warehouse.model.SignUpRequestModel
-import com.banswara.warehouse.model.BaseResponseModel
-import com.banswara.warehouse.model.LoginResponseModel
+import com.banswara.warehouse.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -54,7 +51,7 @@ class RetrofitRepository {
 			})
 	}
 	
-	suspend fun callSignUpApi(pin: Long, deviceId: String,mobile: String, userName: String) {
+	suspend fun callSignUpApi(pin: Long, deviceId: String, mobile: String, userName: String) {
 		
 		retrofitService.signUp(SignUpRequestModel(true, pin, deviceId, mobile, userName))
 			.enqueue(object : Callback<BaseResponseModel> {
@@ -82,10 +79,69 @@ class RetrofitRepository {
 			})
 	}
 	
+	suspend fun fetchFiles(useId: Int, deviceId: String) {
+		
+		retrofitService.fetchFiles(FetchFilesRequestModel(useId, deviceId))
+			.enqueue(object : Callback<List<ChallanFileModel>> {
+				
+				override fun onResponse(
+					call: Call<List<ChallanFileModel>>,
+					response: Response<List<ChallanFileModel>>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.FETCH_FILES(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<List<ChallanFileModel>>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
+	
+	suspend fun fetchContent(useId: Int, deviceId: String, fileName: String) {
+		
+		retrofitService.readFileData(ReadFileDataRequestModel(useId, deviceId, fileName))
+			.enqueue(object : Callback<List<FileContentModel>> {
+				
+				override fun onResponse(
+					call: Call<List<FileContentModel>>,
+					response: Response<List<FileContentModel>>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.FETCH_FILE_CONTENT(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<List<FileContentModel>>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
+	
 	sealed class RequestType {
-		 data class LOGIN(val baseResponseModel: BaseResponseModel) : RequestType()
-		 data class SIGN_UP(val baseResponseModel: BaseResponseModel) : RequestType()
-		 data class DEVICE_CHANGE(val baseResponseModel: BaseResponseModel) : RequestType()
+		data class LOGIN(val baseResponseModel: BaseResponseModel) : RequestType()
+		data class SIGN_UP(val baseResponseModel: BaseResponseModel) : RequestType()
+		data class DEVICE_CHANGE(val baseResponseModel: BaseResponseModel) : RequestType()
+		data class FETCH_FILES(val fetchFilesResponseModel: List<ChallanFileModel>) : RequestType()
+		data class FETCH_FILE_CONTENT(val fetchContentResponseModel: List<FileContentModel>) :
+			RequestType()
 	}
 	
 }

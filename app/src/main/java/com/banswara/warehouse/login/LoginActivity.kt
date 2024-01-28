@@ -10,6 +10,7 @@ import com.banswara.warehouse.dashboard.DashboardActivity
 import com.banswara.warehouse.databinding.ActivityLoginBinding
 import com.banswara.warehouse.model.LoginResponseModel
 import com.banswara.warehouse.network.RetrofitRepository
+import com.banswara.warehouse.utils.PreferenceManager
 import com.banswara.warehouse.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,7 @@ class LoginActivity : AppCompatActivity() {
 					if (it.baseResponseModel is LoginResponseModel) {
 						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
 							.show()
+						PreferenceManager.saveUser(it.baseResponseModel)
 					}
 					
 				}
@@ -46,7 +48,7 @@ class LoginActivity : AppCompatActivity() {
 					Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG).show()
 				}
 				
-				null -> {
+				else -> {
 					Toast.makeText(this, "Please Try Again", Toast.LENGTH_LONG).show()
 				}
 			}

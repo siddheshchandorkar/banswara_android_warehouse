@@ -2,6 +2,7 @@ package com.banswara.warehouse.utils
 
 import android.view.View
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.banswara.warehouse.model.BaseRowModel
@@ -12,6 +13,7 @@ class BindingUtils {
         private const val ROW_DATA = "setRowData"
         private const val VISIBILITY = "android:visibility"
         private const val ERROR = "error"
+        private const val TEXT = "text"
         private const val ON_CLICK = "onClick"
 
         @JvmStatic

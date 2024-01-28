@@ -19,4 +19,5 @@
     <string name="error_enter_4_digit_valid_pin">Please enter 4 digit valid PIN</string>
     <string name="error_enter_mobile_no">Please enter Mobile Number</string>
     <string name="error_valid_mobile">Please Enter valid 10 digit mobile number</string>
+    <string name="proceed">Proceed</string>
 </resources>
