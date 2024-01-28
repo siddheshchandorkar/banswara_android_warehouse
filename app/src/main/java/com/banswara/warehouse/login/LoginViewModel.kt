@@ -1,10 +1,13 @@
 package com.banswara.warehouse.login
 
+import android.app.Application
 import android.text.TextUtils
 import android.view.View
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.banswara.warehouse.R
 
-class LoginViewModel {
+class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	
 	val userName = MutableLiveData<String>()
 	val userNameError = MutableLiveData<String>()
@@ -18,8 +21,7 @@ class LoginViewModel {
 	
 	fun signIn(view: View) {
 		if (checkSignInValidations()) {
-//			events.value = LoginEvents.SIGN_IN
-			isSignInSuccess.value = true
+			events.value = LoginEvents.SIGN_IN
 		}
 	}
 	
@@ -27,17 +29,47 @@ class LoginViewModel {
 		isLogin.value = false
 	}
 	
+	
+	
+	fun logIn(view: View) {
+		if(checkLoginValidations()){
+			events.value = LoginEvents.LOGIN
+		}
+	}
+	
+	private fun checkLoginValidations(): Boolean {
+		if (TextUtils.isEmpty(userName.value)) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_user_name))
+			return false
+		}else if (TextUtils.isEmpty(pin.value)) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_pin))
+			return false
+		}else if (pin.value!!.length< 4) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_4_digit_valid_pin))
+			return false
+		}
+		return true
+	}
+	
 	private fun checkSignInValidations(): Boolean {
 		if (TextUtils.isEmpty(userName.value)) {
-			userNameError.value = "Please Enter User"
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_user_name))
+			return false
+		}else if (TextUtils.isEmpty(mobileNumber.value)) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_mobile_no))
+			return false
+		}else if (mobileNumber.value!!.length< 10) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_valid_mobile))
+			return false
+		}else if (TextUtils.isEmpty(pin.value)) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_pin))
+			return false
+		}else if (pin.value!!.length< 4) {
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_4_digit_valid_pin))
 			return false
 		}
 		
 		return true
-	}
-	
-	fun logIn(view: View) {
-		events.value = LoginEvents.LOGIN
 	}
 	
 	fun backToLogin(view: View) {

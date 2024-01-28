@@ -1,10 +1,8 @@
-package com.banswara.warehouse.dashboard
+package com.banswara.warehouse.model
 
 import android.view.View
 import androidx.databinding.ObservableField
 import com.banswara.warehouse.R
-import com.banswara.warehouse.model.BaseRowModel
-import com.banswara.warehouse.model.DashboardModel
 
 class RowDashboardViewModel(public val dashboardModel: DashboardModel, val onClick : OnClick) : BaseRowModel(){
 	

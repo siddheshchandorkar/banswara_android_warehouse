@@ -3,11 +3,11 @@ package com.banswara.warehouse.dashboard
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.MutableLiveData
 import com.banswara.warehouse.R
 import com.banswara.warehouse.databinding.ActivityDashboardBinding
 import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.model.DashboardModel
+import com.banswara.warehouse.model.RowDashboardViewModel
 
 class DashboardActivity : AppCompatActivity(), RowDashboardViewModel.OnClick {
 	

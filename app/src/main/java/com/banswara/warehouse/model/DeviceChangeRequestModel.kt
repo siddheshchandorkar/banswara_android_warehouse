@@ -1,4 +1,4 @@
-package com.banswara.warehouse.login
+package com.banswara.warehouse.model
 
 import com.google.gson.annotations.SerializedName
 

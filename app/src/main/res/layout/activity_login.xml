@@ -109,6 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberPassword"
+                android:imeOptions="actionDone"
                 android:maxLength="4"
                 android:text="@={vm.pin}" />
 
@@ -124,6 +125,7 @@
             android:background="@drawable/bg_round_golden"
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.signIn}"
+            android:focusable="false"
             android:text="@string/sign_in"
             android:textColor="@color/white"
             android:visibility="@{!vm.isLogin &amp;&amp; !vm.isSignInSuccess}"
@@ -138,6 +140,7 @@
             android:background="@drawable/bg_round_golden"
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.logIn}"
+            android:focusable="false"
             android:text="@string/login"
             android:textColor="@color/white"
             android:visibility="@{vm.isLogin &amp;&amp; !vm.isSignInSuccess}"

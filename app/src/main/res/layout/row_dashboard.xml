@@ -5,7 +5,7 @@
     <data>
         <variable
             name="vm"
-            type="com.banswara.warehouse.dashboard.RowDashboardViewModel" />
+            type="com.banswara.warehouse.model.RowDashboardViewModel" />
     </data>
 
 <androidx.constraintlayout.widget.ConstraintLayout

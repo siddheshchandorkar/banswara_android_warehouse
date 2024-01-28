@@ -14,7 +14,5 @@ data class LoginResponseModel(
 	@SerializedName("vMobile")
 	val mobileNumber: String,
 	@SerializedName("vUserName")
-	val userName: String,
-	@SerializedName("vErrorMsg")
-	val errorMsg: String
-)
+	val userName: String
+): BaseResponseModel()

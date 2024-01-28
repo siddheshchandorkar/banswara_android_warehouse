@@ -1,10 +1,10 @@
 package com.banswara.warehouse.network
 
-import com.banswara.warehouse.dashboard.FetchFilesRequestModel
-import com.banswara.warehouse.dashboard.ReadFileDataRequestModel
-import com.banswara.warehouse.login.DeviceChangeRequestModel
-import com.banswara.warehouse.login.LoginRequestModel
-import com.banswara.warehouse.login.SignUpRequestModel
+import com.banswara.warehouse.model.FetchFilesRequestModel
+import com.banswara.warehouse.model.ReadFileDataRequestModel
+import com.banswara.warehouse.model.DeviceChangeRequestModel
+import com.banswara.warehouse.model.LoginRequestModel
+import com.banswara.warehouse.model.SignUpRequestModel
 import com.banswara.warehouse.model.*
 import retrofit2.Call
 import retrofit2.http.Body

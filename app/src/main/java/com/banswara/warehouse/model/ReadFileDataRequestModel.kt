@@ -1,4 +1,4 @@
-package com.banswara.warehouse.dashboard
+package com.banswara.warehouse.model
 
 import com.google.gson.annotations.SerializedName
 
