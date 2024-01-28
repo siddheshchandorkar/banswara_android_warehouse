@@ -1,24 +1,36 @@
 package com.banswara.warehouse.network
 
-import com.banswara.warehouse.model.BaseResponseModel
+import com.banswara.warehouse.dashboard.FetchFilesRequestModel
+import com.banswara.warehouse.dashboard.ReadFileDataRequestModel
+import com.banswara.warehouse.login.DeviceChangeRequestModel
+import com.banswara.warehouse.login.LoginRequestModel
+import com.banswara.warehouse.login.SignUpRequestModel
+import com.banswara.warehouse.model.*
 import retrofit2.Call
-import retrofit2.http.GET
+import retrofit2.http.Body
 import retrofit2.http.POST
 
 /*
 * Retrofit Api Service
 * */
 interface RetrofitService {
-
-
-    @GET("/pnb/v1/Agent/RetailerProgramMaster")
-    fun signUp(): Call<BaseResponseModel>
-//    @POST("signup")
-//    fun signUp(@Body signUpRequest: UserModel): Call<BaseResponseModel>
-//
-//    @POST("retailer-goal")
-//    fun goal(@Header("resource-owner-uid")  userkey: String, @Body goal: GoalRequestModel): Call<BaseResponseModel>
-//
-//    @POST("retailer-transaction")
-//    fun transaction(@Header("resource-owner-uid")  userkey: String,@Body goal: TransactionRequestModel): Call<BaseResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Insert_User")
+	fun signUp(@Body signUpRequestModel: SignUpRequestModel): Call<BaseResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Fetch_User")
+	fun login(@Body loginRequestModel: LoginRequestModel): Call<LoginResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Read_Directory_File")
+	fun fetchFiles(@Body fetchFilesRequestModel: FetchFilesRequestModel): Call<FetchFilesResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Read_Text_File")
+	fun readFileData(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<FetchFilesResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Copy_File_Process")
+	fun processFile(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<ProcessFileResponseModel>
+ 
+	@POST("/Api/AppApi/Fn_Change_User_Device")
+	fun changeUserDevice(@Body deviceChangeRequestModel: DeviceChangeRequestModel): Call<LoginResponseModel>
+	
 }

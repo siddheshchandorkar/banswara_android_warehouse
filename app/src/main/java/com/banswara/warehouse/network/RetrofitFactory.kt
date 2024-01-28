@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 */
 object RetrofitFactory {
 	
-	private const val BASE_URL = "https://uatdc.paynearby.in:8080"
+	private const val BASE_URL = "https://f1651b69-29b0-4b1d-b9ff-2fb1e8be869e.mock.pstmn.io/" //TODO Siddhesh this is mock server url
 	fun makeRetrofitService(): RetrofitService {
 		val interceptor = HttpLoggingInterceptor()
 		interceptor.level = HttpLoggingInterceptor.Level.BODY
