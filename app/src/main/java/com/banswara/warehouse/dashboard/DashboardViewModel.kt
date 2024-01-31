@@ -16,6 +16,7 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 	var fileName: MutableLiveData<String> = MutableLiveData<String>("")
 	
 	val isApiCalling: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+	val allScanned: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
 	val user: LoginResponseModel? = PreferenceManager.getUser()
 	
 	init {
@@ -26,9 +27,18 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 	fun fetchFileContent(view: View) {
 		events.value = DASHBOARD_EVENTS.FETCH_FILE_CONTENT
 	}
+	fun processScanFile(view: View) {
+		events.value = DASHBOARD_EVENTS.PROCESS_FILE
+	}
+	
+	fun scanCode(view: View) {
+		events.value = DASHBOARD_EVENTS.SCAN
+	}
 	
 	sealed class DASHBOARD_EVENTS {
 		data object FETCH_FILES : DASHBOARD_EVENTS()
 		data object FETCH_FILE_CONTENT : DASHBOARD_EVENTS()
+		data object PROCESS_FILE : DASHBOARD_EVENTS()
+		data object SCAN : DASHBOARD_EVENTS()
 	}
 }

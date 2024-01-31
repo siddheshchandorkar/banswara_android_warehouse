@@ -135,6 +135,34 @@ class RetrofitRepository {
 			})
 	}
 	
+	suspend fun uploadScannedFile(useId: Int, deviceId: String, fileName: String) {
+		
+		retrofitService.processFile(ReadFileDataRequestModel(useId, deviceId, fileName))
+			.enqueue(object : Callback<ProcessFileResponseModel> {
+				
+				override fun onResponse(
+					call: Call<ProcessFileResponseModel>,
+					response: Response<ProcessFileResponseModel>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.PROCESS_FILE(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<ProcessFileResponseModel>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
+	
 	sealed class RequestType {
 		data class LOGIN(val baseResponseModel: BaseResponseModel) : RequestType()
 		data class SIGN_UP(val baseResponseModel: BaseResponseModel) : RequestType()
@@ -142,6 +170,8 @@ class RetrofitRepository {
 		data class FETCH_FILES(val fetchFilesResponseModel: List<ChallanFileModel>) : RequestType()
 		data class FETCH_FILE_CONTENT(val fetchContentResponseModel: List<FileContentModel>) :
 			RequestType()
+		data class PROCESS_FILE(val processFileResponseModel: ProcessFileResponseModel) : RequestType()
+		
 	}
 	
 }

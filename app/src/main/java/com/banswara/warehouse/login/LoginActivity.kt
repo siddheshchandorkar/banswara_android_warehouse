@@ -39,6 +39,10 @@ class LoginActivity : AppCompatActivity() {
 						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
 							.show()
 						PreferenceManager.saveUser(it.baseResponseModel)
+						PreferenceManager.getUser()?.let {
+							startActivity(Intent(this, DashboardActivity::class.java))
+							
+						}
 					}
 					
 				}
