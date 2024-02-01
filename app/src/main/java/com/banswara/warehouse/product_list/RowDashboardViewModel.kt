@@ -1,7 +1,9 @@
-package com.banswara.warehouse.model
+package com.banswara.warehouse.product_list
 
 import androidx.databinding.ObservableField
 import com.banswara.warehouse.R
+import com.banswara.warehouse.model.BaseRowModel
+import com.banswara.warehouse.model.FileContentModel
 
 class RowDashboardViewModel(challanFileModel: FileContentModel) : BaseRowModel() {
 	

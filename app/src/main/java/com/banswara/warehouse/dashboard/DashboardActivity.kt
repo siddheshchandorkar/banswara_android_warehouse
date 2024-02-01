@@ -1,14 +1,13 @@
 package com.banswara.warehouse.dashboard
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
 import com.banswara.warehouse.databinding.ActivityDashboardBinding
 import com.banswara.warehouse.model.BaseRowModel
-import com.banswara.warehouse.model.RowDashboardViewModel
+import com.banswara.warehouse.product_list.RowDashboardViewModel
 import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.utils.Utils
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -114,8 +113,6 @@ class DashboardActivity : AppCompatActivity() {
 				is RetrofitRepository.RequestType.FETCH_FILES -> {
 					viewModel.isApiCalling.value = false
 					val files = it.fetchFilesResponseModel
-					val arrayAdapter = ArrayAdapter(this, R.layout.row_dropdown, files)
-					binding.autoCompleteTextView.setAdapter(arrayAdapter)
 				}
 
 				is RetrofitRepository.RequestType.FETCH_FILE_CONTENT -> {

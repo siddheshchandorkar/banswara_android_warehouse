@@ -6,7 +6,7 @@
 
         <variable
             name="vm"
-            type="com.banswara.warehouse.model.RowDashboardViewModel" />
+            type="com.banswara.warehouse.product_list.RowDashboardViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
