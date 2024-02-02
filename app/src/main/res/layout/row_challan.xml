@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -7,7 +6,7 @@
 
         <variable
             name="vm"
-            type="com.banswara.warehouse.dashboard.RowFilesViewModel" />
+            type="com.banswara.warehouse.product_list.RowChallanViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +14,7 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:clickable="true"
-        android:onClick="@{vm.onFileSelected}">
+        android:onClick="@{vm.onChallanSelected}">
 
 
         <TextView
@@ -25,7 +24,7 @@
             android:layout_margin="16dp"
             android:layout_marginEnd="16dp"
             android:fontFamily="@font/font_bold"
-            android:text="@{vm.fileName}"
+            android:text="@{vm.challanNo}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/tv_status"
@@ -57,6 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="04 items"
+            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_file_name" />
 
@@ -79,4 +79,6 @@
             app:layout_constraintTop_toBottomOf="@id/tv_count" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </layout>
