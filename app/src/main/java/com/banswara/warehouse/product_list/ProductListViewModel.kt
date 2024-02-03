@@ -1,10 +1,12 @@
 package com.banswara.warehouse.product_list
 
 import android.app.Application
+import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.banswara.warehouse.dashboard.DashboardViewModel
 import com.banswara.warehouse.model.BaseRowModel
+import com.banswara.warehouse.model.FileContentModel
 import com.banswara.warehouse.model.LoginResponseModel
 import com.banswara.warehouse.utils.PreferenceManager
 
@@ -24,11 +26,13 @@ class ProductListViewModel(file :String, app: Application): AndroidViewModel(app
 		events.value = EVENTS.FETCH_FILE_CONTENT
 	}
 	
-	
+	fun onShipped(view  : View){
+		events.value = EVENTS.PROCESS_FILE
+	}
 	sealed class EVENTS {
 		data object FETCH_FILE_CONTENT : EVENTS()
 		data object PROCESS_FILE : EVENTS()
 		data object MOVE_TO_SUCCESS : EVENTS()
-		data class SCAN(val challanNo : String) : EVENTS()
+		data class SCAN(val challanRow: RowChallanViewModel) : EVENTS()
 	}
 }

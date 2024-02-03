@@ -20,4 +20,7 @@
     <string name="error_enter_mobile_no">Please enter Mobile Number</string>
     <string name="error_valid_mobile">Please Enter valid 10 digit mobile number</string>
     <string name="proceed">Proceed</string>
+    <string name="pending">Pending</string>
+    <string name="scanned">Scanned</string>
+    <string name="items_shipped">Items Shipped</string>
 </resources>

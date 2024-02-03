@@ -4,6 +4,8 @@
 
     <data>
 
+        <import type="com.banswara.warehouse.utils.StatusRetention" />
+
         <variable
             name="vm"
             type="com.banswara.warehouse.product_list.RowChallanViewModel" />
@@ -12,8 +14,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusable="true"
         android:clickable="true"
+        android:focusable="true"
         android:onClick="@{vm.onChallanSelected}">
 
 
@@ -37,15 +39,15 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/bg_round_orange"
-            android:drawableStart="@drawable/ic_pending"
+            android:background="@{vm.status == StatusRetention.SCANNED? @drawable/bg_round_green : @drawable/bg_round_orange}"
+            android:drawableStart="@{vm.status == StatusRetention.SCANNED? @drawable/ic_scanned : @drawable/ic_pending}"
             android:fontFamily="@font/font_medium"
             android:paddingStart="5dp"
             android:paddingTop="3dp"
             android:paddingEnd="5dp"
             android:paddingBottom="3dp"
-            android:text="Pending"
-            android:textColor="@color/white"
+            android:text="@{vm.status == StatusRetention.SCANNED? @string/scanned :@string/pending}"
+            android:textColor="@{vm.status == StatusRetention.SCANNED? @color/c_27A340: @color/white}"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

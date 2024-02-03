@@ -1,15 +1,19 @@
 package com.banswara.warehouse.product_list
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
 import com.banswara.warehouse.databinding.ActivityProductListBinding
 import com.banswara.warehouse.model.BaseRowModel
-import com.banswara.warehouse.model.FileContentModel
 import com.banswara.warehouse.network.RetrofitRepository
+import com.banswara.warehouse.success.SuccessActivity
+import com.banswara.warehouse.utils.StatusRetention
 import com.banswara.warehouse.utils.Utils
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
@@ -38,10 +42,20 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
 		
+		supportActionBar?.let {
+			if (supportActionBar == null) {
+				setSupportActionBar(binding.toolbar)
+				it.setDisplayHomeAsUpEnabled(true)
+				it.setDisplayShowHomeEnabled(true)
+				it.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.ic_back))
+			}
+		}
+		
 		val options = GmsBarcodeScannerOptions.Builder()
 			.setBarcodeFormats(
 				Barcode.FORMAT_QR_CODE,
-				Barcode.FORMAT_AZTEC)
+				Barcode.FORMAT_AZTEC
+			)
 			.build()
 		val scanner = GmsBarcodeScanning.getClient(this, options)
 		
@@ -67,26 +81,26 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 							var allChallanScan = true
 							// Task completed successfully
 							barcode.rawValue?.let { code ->
-								if (code == it.challanNo) {
+								if (code == it.challanRow.challanNo.get()) {
+									
 									Toast.makeText(this, code + " is present", Toast.LENGTH_LONG)
 										.show()
-									
+									val list: ArrayList<BaseRowModel> =
+										viewModel.challanListLiveData.value!!
+									list.remove(it.challanRow as BaseRowModel)
+									it.challanRow.status.set(StatusRetention.SCANNED)
+									list.add(it.challanRow)
+									viewModel.challanListLiveData.value = list
 								}
-//								viewModel.challanListLiveData.value!!.forEach { row ->
-//									if(row is RowChallanViewModel){
-//										if(code == row.challanNo.get()){
-//											Toast.makeText(this, code+" is present", Toast.LENGTH_LONG).show()
-//											row.isSelected.set(true)
-//										}
-//										if (row.isSelected.get() ==false){
-//											allChallanScan =false
-//										}
-//									}
-//
-//								}
+								
+								viewModel.challanListLiveData.value?.forEach {
+									if ((it as RowChallanViewModel).status.get() != StatusRetention.SCANNED) {
+										allChallanScan = false
+									}
+								}
+								viewModel.allScanned.value = true
+								
 							}
-//							viewModel.allScanned.value = allChallanScan
-							
 						}
 						.addOnCanceledListener {
 							// Task canceled
@@ -94,7 +108,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 						}
 						.addOnFailureListener { e ->
 							// Task failed with an exception
-							Log.d("ProductListActivity", "Scan Failed : "+e.message)
+							Log.d("ProductListActivity", "Scan Failed : " + e.message)
 							
 						}
 					
@@ -112,7 +126,9 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 				}
 				
 				ProductListViewModel.EVENTS.MOVE_TO_SUCCESS -> {
-				
+					val intent = Intent(this, SuccessActivity::class.java)
+					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, false)
+					startActivity(intent)
 				}
 			}
 		}
@@ -142,11 +158,23 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 		}
 	}
 	
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when (item.itemId) {
+			android.R.id.home -> {
+				//TODO Siddhesh save details in db
+				finish()
+				
+			}
+		}
+		return super.onOptionsItemSelected(item)
+	}
+	
+	
 	companion object {
 		const val KEY_FILE_NAME = "file_name"
 	}
 	
-	override fun onChallanClick(challanFileModel: FileContentModel) {
-		viewModel.events.value = ProductListViewModel.EVENTS.SCAN(challanFileModel.fileContent)
+	override fun onChallanClick(challanRow: RowChallanViewModel) {
+		viewModel.events.value = ProductListViewModel.EVENTS.SCAN(challanRow)
 	}
 }

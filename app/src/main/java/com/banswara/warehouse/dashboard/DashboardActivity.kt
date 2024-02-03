@@ -33,14 +33,15 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 			when (it) {
 				
 				DashboardViewModel.DASHBOARD_EVENTS.FETCH_FILES -> {
-					CoroutineScope(Dispatchers.IO).launch {
-						viewModel.isApiCalling.postValue(true)
-						RetrofitRepository.instance.fetchFiles(
-							viewModel.user!!.userId,
-							Utils.getDeviceId(contentResolver)
-						)
+					viewModel.user?.let { user ->
+						CoroutineScope(Dispatchers.IO).launch {
+							viewModel.isApiCalling.postValue(true)
+							RetrofitRepository.instance.fetchFiles(
+								user.userId,
+								Utils.getDeviceId(contentResolver)
+							)
+						}
 					}
-					
 				}
 				
 				else -> {}

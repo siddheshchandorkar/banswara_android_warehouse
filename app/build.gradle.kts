@@ -68,6 +68,7 @@ dependencies {
 	
 	//QR code scanner
 	implementation ("com.google.android.gms:play-services-code-scanner:16.1.0")
-	
+//	implementation 'com.google.android.gms:play-services-base:18.3.0'
+//	implementation 'com.google.android.gms:play-services-tflite-java:16.2.0-beta02'
 	
 }
