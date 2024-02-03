@@ -27,7 +27,6 @@
             android:fontFamily="@font/font_regular"
             android:text="@{vm.isLogin? @string/welcome_to: @string/sign_up}"
             android:textSize="22sp"
-            android:visibility="@{!vm.isSignInSuccess}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/welcome_to" />
@@ -42,7 +41,6 @@
             android:fontFamily="@font/font_bold"
             android:text="@{vm.isLogin? @string/warehouse_by_banswara: @string/create_new_account}"
             android:textSize="28sp"
-            android:visibility="@{!vm.isSignInSuccess}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_welcome"
@@ -56,7 +54,6 @@
             android:layout_marginTop="48dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/user_name"
-            android:visibility="@{!vm.isSignInSuccess}"
             app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -65,6 +62,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLength="25"
+                android:imeOptions="actionNext"
+                android:maxLines="1"
                 android:text="@={vm.userName}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -78,7 +77,7 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/mobile_number"
-            android:visibility="@{!vm.isLogin &amp;&amp; !vm.isSignInSuccess}"
+            android:visibility="@{!vm.isLogin}"
             app:layout_constraintTop_toBottomOf="@id/til_user_name">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -88,6 +87,8 @@
                 android:digits="0123456789"
                 android:inputType="number"
                 android:maxLength="10"
+                android:maxLines="1"
+                android:imeOptions="actionNext"
                 android:text="@={vm.mobileNumber}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -100,7 +101,6 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/pin"
-            android:visibility="@{!vm.isSignInSuccess}"
             app:layout_constraintTop_toBottomOf="@id/til_mobile_number"
             app:passwordToggleEnabled="true">
 
@@ -111,6 +111,7 @@
                 android:inputType="numberPassword"
                 android:imeOptions="actionDone"
                 android:maxLength="4"
+                android:maxLines="1"
                 android:text="@={vm.pin}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -122,13 +123,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/bg_round_golden"
+            android:background="@drawable/bg_button"
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.signIn}"
+            android:enabled="@{vm.signInEnable}"
             android:focusable="false"
             android:text="@string/sign_in"
             android:textColor="@color/white"
-            android:visibility="@{!vm.isLogin &amp;&amp; !vm.isSignInSuccess}"
+            android:visibility="@{!vm.isLogin}"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:visibility="gone" />
 
@@ -137,13 +139,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:background="@drawable/bg_round_golden"
+            android:background="@drawable/bg_button"
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.logIn}"
             android:focusable="false"
+            android:enabled="@{vm.loginEnable}"
             android:text="@string/login"
             android:textColor="@color/white"
-            android:visibility="@{vm.isLogin &amp;&amp; !vm.isSignInSuccess}"
+            android:visibility="@{vm.isLogin}"
             app:layout_constraintBottom_toTopOf="@id/ll_sign_up" />
 
         <LinearLayout
@@ -154,7 +157,7 @@
             android:gravity="center"
             android:onClick="@{vm.createAccount}"
             android:orientation="horizontal"
-            android:visibility="@{vm.isLogin &amp;&amp; !vm.isSignInSuccess}"
+            android:visibility="@{vm.isLogin}"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView
@@ -181,71 +184,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toEndOf="@id/tv_create_account" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/iv_success"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_round"
-            android:padding="32dp"
-            android:src="@drawable/ic_checked_golden"
-            android:visibility="@{vm.isSignInSuccess}"
-            app:layout_constraintBottom_toTopOf="@id/tv_success_msg"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/tv_success_msg"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="16dp"
-            android:fontFamily="@font/font_bold"
-            android:gravity="center"
-            android:text="@string/msg_sign_in_success"
-            android:textSize="24sp"
-            android:visibility="@{vm.isSignInSuccess}"
-            app:layout_constraintBottom_toTopOf="@id/ll_login_back"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_success"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/ll_login_back"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="32dp"
-            android:background="@drawable/bg_round_grey"
-            android:gravity="center"
-            android:onClick="@{vm.backToLogin}"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:visibility="@{vm.isSignInSuccess}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:visibility="gone">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_plus" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/font_bold"
-                android:text="@string/back_to_login"
-                android:textColor="@color/c_B87D3E"
-                android:textSize="16sp" />
 
         </LinearLayout>
 

@@ -13,14 +13,14 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	val userNameError = MutableLiveData<String>()
 	val mobileNumber = MutableLiveData<String>()
 	val isLogin = MutableLiveData<Boolean>(true)
-	val isSignInSuccess = MutableLiveData<Boolean>(false)
-	val deviceId = MutableLiveData<String>()
+	val loginEnable = MutableLiveData<Boolean>(false)
+	val signInEnable = MutableLiveData<Boolean>(false)
 	val pin = MutableLiveData<String>()
 	val events = MutableLiveData<LoginEvents>()
 	
 	
 	fun signIn(view: View) {
-		if (checkSignInValidations()) {
+		if (checkSignInValidations(true)) {
 			events.value = LoginEvents.SIGN_IN
 		}
 	}
@@ -32,39 +32,47 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	
 	
 	fun logIn(view: View) {
-		if(checkLoginValidations()){
+		if(checkLoginValidations(true)){
 			events.value = LoginEvents.LOGIN
 		}
 	}
 	
-	private fun checkLoginValidations(): Boolean {
+	 fun checkLoginValidations(showError: Boolean): Boolean {
 		if (TextUtils.isEmpty(userName.value)) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_user_name))
 			return false
 		}else if (TextUtils.isEmpty(pin.value)) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_pin))
 			return false
 		}else if (pin.value!!.length< 4) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_4_digit_valid_pin))
 			return false
 		}
 		return true
 	}
 	
-	private fun checkSignInValidations(): Boolean {
+	 fun checkSignInValidations(showError: Boolean): Boolean {
 		if (TextUtils.isEmpty(userName.value)) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_user_name))
 			return false
 		}else if (TextUtils.isEmpty(mobileNumber.value)) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_mobile_no))
 			return false
 		}else if (mobileNumber.value!!.length< 10) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_valid_mobile))
 			return false
 		}else if (TextUtils.isEmpty(pin.value)) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_pin))
 			return false
 		}else if (pin.value!!.length< 4) {
+			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_4_digit_valid_pin))
 			return false
 		}
@@ -74,7 +82,6 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	
 	fun backToLogin(view: View) {
 		isLogin.value = true
-		isSignInSuccess.value = false
 	}
 	
 	sealed class LoginEvents {

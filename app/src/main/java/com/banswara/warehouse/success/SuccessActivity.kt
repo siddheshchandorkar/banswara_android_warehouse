@@ -22,9 +22,15 @@ class SuccessActivity : AppCompatActivity() {
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
 		
+		binding.llLoginBack.setOnClickListener {
+			finish()
+		}
+		
 	}
 	
 	companion object{
 		const val KEY_FROM_LOGIN ="from"
 	}
+	
+	
 }

@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
+import com.banswara.warehouse.dashboard.DashboardActivity
 import com.banswara.warehouse.databinding.ActivityProductListBinding
 import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.network.RetrofitRepository
@@ -27,6 +30,14 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 	private lateinit var viewModel: ProductListViewModel
 	private lateinit var binding: ActivityProductListBinding
 	
+	
+	private var successLauncher = registerForActivityResult<Intent, ActivityResult>(
+		ActivityResultContracts.StartActivityForResult()
+	) { result: ActivityResult? ->
+		startActivity(Intent(this, DashboardActivity::class.java))
+		finish()
+		
+	}
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -128,7 +139,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 				ProductListViewModel.EVENTS.MOVE_TO_SUCCESS -> {
 					val intent = Intent(this, SuccessActivity::class.java)
 					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, false)
-					startActivity(intent)
+					successLauncher.launch(intent)
 				}
 			}
 		}
