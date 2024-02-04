@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
 import com.banswara.warehouse.dashboard.DashboardActivity
+import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityProductListBinding
 import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.network.RetrofitRepository
@@ -94,7 +95,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 							barcode.rawValue?.let { code ->
 								if (code == it.challanRow.challanNo.get()) {
 									
-									Toast.makeText(this, code + " is present", Toast.LENGTH_LONG)
+									Toast.makeText(this, code + " is Scanned", Toast.LENGTH_LONG)
 										.show()
 									val list: ArrayList<BaseRowModel> =
 										viewModel.challanListLiveData.value!!
@@ -102,6 +103,10 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 									it.challanRow.status.set(StatusRetention.SCANNED)
 									list.add(it.challanRow)
 									viewModel.challanListLiveData.value = list
+									CoroutineScope(Dispatchers.Default).launch {
+										it.challanRow.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
+										 WareHouseDB.getDataBase(this@ProductListActivity)?.wareHouseDao()?.updateChallanStatus(it.challanRow.challanFileModel)
+									}
 								}
 								
 								viewModel.challanListLiveData.value?.forEach {
@@ -109,7 +114,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 										allChallanScan = false
 									}
 								}
-								viewModel.allScanned.value = true
+								viewModel.allScanned.value = allChallanScan
 								
 							}
 						}
@@ -151,7 +156,12 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 					viewModel.isApiCalling.value = false
 					val list = arrayListOf<BaseRowModel>()
 					it.fetchContentResponseModel.forEach { content ->
+						content.fileName = viewModel.fileName.value!!
+						content.fileStatus = StatusRetention.STATUS_PENDING
 						list.add(RowChallanViewModel(content, this))
+						CoroutineScope(Dispatchers.Default).launch {
+							WareHouseDB.getDataBase(this@ProductListActivity)?.wareHouseDao()?.insertChallan(content)
+						}
 					}
 					viewModel.challanListLiveData.value = (list)
 					
@@ -186,6 +196,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 	}
 	
 	override fun onChallanClick(challanRow: RowChallanViewModel) {
+		
 		viewModel.events.value = ProductListViewModel.EVENTS.SCAN(challanRow)
 	}
 }

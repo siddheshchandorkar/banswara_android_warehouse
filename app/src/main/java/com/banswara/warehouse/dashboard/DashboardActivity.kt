@@ -76,7 +76,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 	override fun onFileSelect(challanFileModel: ChallanFileModel) {
 		challanFileModel.fileStatus = "In Progress"
 		CoroutineScope(Dispatchers.Default).launch {
-			Log.d("Siddhesh", "File Updated : "+WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()?.updateFileStatus(challanFileModel))
+			WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()?.updateFileStatus(challanFileModel)
 		}
 		val intent = Intent(this, ProductListActivity::class.java)
 		intent.putExtra(ProductListActivity.KEY_FILE_NAME, challanFileModel.fileName)

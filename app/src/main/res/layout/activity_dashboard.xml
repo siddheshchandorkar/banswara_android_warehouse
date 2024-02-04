@@ -20,13 +20,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="#F9F9F9">
+            android:background="@color/c_113656">
 
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/c_113656"
-                android:textSize="16sp"
+                app:titleTextColor="@color/white"
                 app:title="Hi, Rahul"/>
         </com.google.android.material.appbar.AppBarLayout>
 

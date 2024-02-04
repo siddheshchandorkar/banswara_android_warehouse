@@ -19,13 +19,14 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#F9F9F9"
+            android:background="@color/c_113656"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:titleTextColor="@color/white"
                 app:title="@{vm.fileName}" />
         </com.google.android.material.appbar.AppBarLayout>
 

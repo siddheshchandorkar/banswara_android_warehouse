@@ -7,7 +7,7 @@ import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.model.FileContentModel
 import com.banswara.warehouse.utils.StatusRetention
 
-class RowChallanViewModel(private val challanFileModel: FileContentModel, private val challanClick: ChallanClick) : BaseRowModel() {
+class RowChallanViewModel( val challanFileModel: FileContentModel, private val challanClick: ChallanClick) : BaseRowModel() {
 	
 	val challanNo: ObservableField<String> = ObservableField(challanFileModel.fileContent)
 	val isSelected: ObservableField<Boolean> = ObservableField(false)

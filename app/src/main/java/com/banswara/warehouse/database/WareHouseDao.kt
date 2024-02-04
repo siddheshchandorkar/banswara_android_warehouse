@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Transaction
 import androidx.room.Update
 import com.banswara.warehouse.model.ChallanFileModel
+import com.banswara.warehouse.model.FileContentModel
 import com.banswara.warehouse.model.LoginResponseModel
 import com.banswara.warehouse.model.SignUpRequestModel
 
@@ -35,10 +36,17 @@ interface WareHouseDao {
 	fun updateFileStatus(file: ChallanFileModel)
 	
 	//Insert Challan Details
+	@Insert(onConflict = OnConflictStrategy.IGNORE)
+	@Transaction
+	fun insertChallan(challan: FileContentModel) : Long
 	
 	//Update Challan Status
+	@Update(entity = FileContentModel::class)
+	@Transaction
+	fun updateChallanStatus(fileContentModel: FileContentModel)
 	
 	//Get Challan list for corresponding file
+	
 	
 	
 	
