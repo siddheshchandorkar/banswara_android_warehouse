@@ -2,9 +2,11 @@ package com.banswara.warehouse.database
 
 import android.content.Context
 import androidx.room.*
+import com.banswara.warehouse.model.ChallanFileModel
+import com.banswara.warehouse.model.LoginResponseModel
 
 
-@Database(entities = [CustomerDetailsModel::class], version = 1, exportSchema = true)
+@Database(entities = [LoginResponseModel::class, ChallanFileModel::class], version = 1, exportSchema = true)
 abstract class WareHouseDB : RoomDatabase() {
     abstract fun wareHouseDao(): WareHouseDao
 

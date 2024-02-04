@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
 import com.banswara.warehouse.dashboard.DashboardActivity
+import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityLoginBinding
 import com.banswara.warehouse.model.LoginResponseModel
 import com.banswara.warehouse.network.RetrofitRepository
@@ -106,14 +107,16 @@ class LoginActivity : AppCompatActivity() {
 				}
 				
 				is RetrofitRepository.RequestType.LOGIN -> {
-					if (it.baseResponseModel is LoginResponseModel) {
-						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
+						
+						WareHouseDB.getDataBase(this)?.wareHouseDao()?.insert(it.loginResponse)
+						
+						Toast.makeText(this, it.loginResponse.errorMsg, Toast.LENGTH_LONG)
 							.show()
-						PreferenceManager.saveUser(it.baseResponseModel)
+						PreferenceManager.saveUser(it.loginResponse)
 						PreferenceManager.getUser()?.let {
 							startActivity(Intent(this, DashboardActivity::class.java))
 						}
-					}
+					
 				}
 				
 				is RetrofitRepository.RequestType.SIGN_UP -> {

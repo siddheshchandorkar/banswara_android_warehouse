@@ -17,7 +17,6 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 	
 	init {
 		fileListLiveData.value = (arrayListOf<BaseRowModel>())
-		events.value = DASHBOARD_EVENTS.FETCH_FILES
 	}
 	
 	sealed class DASHBOARD_EVENTS {
