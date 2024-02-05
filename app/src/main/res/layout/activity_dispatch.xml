@@ -7,7 +7,7 @@
 
         <variable
             name="vm"
-            type="com.banswara.warehouse.product_list.ProductListViewModel" />
+            type="com.banswara.warehouse.dispatch.DispatchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,14 +19,14 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/c_113656"
+            android:background="@color/white"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleTextColor="@color/white"
+                app:titleTextColor="@color/c_113656"
                 app:title="@{vm.fileName}" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,7 +51,7 @@
             android:focusable="false"
             android:onClick="@{vm.onShipped}"
             android:fontFamily="@font/open_sans_bold"
-            android:text="@string/items_shipped"
+            android:text="Dispatch"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent" />
 

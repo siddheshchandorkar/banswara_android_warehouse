@@ -2,6 +2,7 @@ package com.banswara.warehouse.utils
 
 import android.view.View
 import android.widget.EditText
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ class BindingUtils {
     companion object {
         private const val ROW_DATA = "setRowData"
         private const val VISIBILITY = "android:visibility"
+        private const val TITLE = "app:title"
         private const val ERROR = "error"
         private const val TEXT = "text"
         private const val ON_CLICK = "onClick"
@@ -46,6 +48,12 @@ class BindingUtils {
         @BindingAdapter(ERROR)
         fun bindError(editText: EditText, error: String?) {
             editText.error = error
+        }
+        
+        @JvmStatic
+        @BindingAdapter(TITLE)
+        fun bindTitle(editText: Toolbar, text: String?) {
+            editText.title = text?:""
         }
 
     }

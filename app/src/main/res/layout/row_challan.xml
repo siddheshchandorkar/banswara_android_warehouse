@@ -8,7 +8,7 @@
 
         <variable
             name="vm"
-            type="com.banswara.warehouse.product_list.RowChallanViewModel" />
+            type="com.banswara.warehouse.dispatch.RowChallanViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

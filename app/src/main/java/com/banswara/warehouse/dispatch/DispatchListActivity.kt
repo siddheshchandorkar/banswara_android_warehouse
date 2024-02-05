@@ -1,4 +1,4 @@
-package com.banswara.warehouse.product_list
+package com.banswara.warehouse.dispatch
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
 import com.banswara.warehouse.dashboard.DashboardActivity
 import com.banswara.warehouse.database.WareHouseDB
-import com.banswara.warehouse.databinding.ActivityProductListBinding
+import com.banswara.warehouse.databinding.ActivityDispatchBinding
 import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.success.SuccessActivity
@@ -26,10 +26,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClick {
+class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClick {
 	
-	private lateinit var viewModel: ProductListViewModel
-	private lateinit var binding: ActivityProductListBinding
+	private lateinit var viewModel: DispatchViewModel
+	private lateinit var binding: ActivityDispatchBinding
 	
 	
 	private var successLauncher = registerForActivityResult<Intent, ActivityResult>(
@@ -42,12 +42,12 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_product_list)
+		binding = DataBindingUtil.setContentView(this, R.layout.activity_dispatch)
 		
 		intent?.let {
 			if (it.hasExtra(KEY_FILE_NAME)) {
 				val fileName = it.getStringExtra(KEY_FILE_NAME) ?: ""
-				viewModel = ProductListViewModel(fileName, application)
+				viewModel = DispatchViewModel(fileName, application)
 			}
 		}
 		
@@ -73,7 +73,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 		
 		viewModel.events.observe(this) {
 			when (it) {
-				ProductListViewModel.EVENTS.FETCH_FILE_CONTENT -> {
+				DispatchViewModel.EVENTS.FETCH_FILE_CONTENT -> {
 					CoroutineScope(Dispatchers.IO).launch {
 						viewModel.isApiCalling.postValue(true)
 						RetrofitRepository.instance.fetchContent(
@@ -85,7 +85,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 				}
 				
 				
-				is ProductListViewModel.EVENTS.SCAN -> {
+				is DispatchViewModel.EVENTS.SCAN -> {
 					
 					scanner.startScan()
 						.addOnSuccessListener { barcode ->
@@ -105,7 +105,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 									viewModel.challanListLiveData.value = list
 									CoroutineScope(Dispatchers.Default).launch {
 										it.challanRow.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
-										 WareHouseDB.getDataBase(this@ProductListActivity)?.wareHouseDao()?.updateChallanStatus(it.challanRow.challanFileModel)
+										 WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()?.updateChallanStatus(it.challanRow.challanFileModel)
 									}
 								}
 								
@@ -130,7 +130,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 					
 				}
 				
-				ProductListViewModel.EVENTS.PROCESS_FILE -> {
+				DispatchViewModel.EVENTS.PROCESS_FILE -> {
 					CoroutineScope(Dispatchers.IO).launch {
 						viewModel.isApiCalling.postValue(true)
 						RetrofitRepository.instance.uploadScannedFile(
@@ -141,7 +141,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 					}
 				}
 				
-				ProductListViewModel.EVENTS.MOVE_TO_SUCCESS -> {
+				DispatchViewModel.EVENTS.MOVE_TO_SUCCESS -> {
 					val intent = Intent(this, SuccessActivity::class.java)
 					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, false)
 					successLauncher.launch(intent)
@@ -160,7 +160,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 						content.fileStatus = StatusRetention.STATUS_PENDING
 						list.add(RowChallanViewModel(content, this))
 						CoroutineScope(Dispatchers.Default).launch {
-							WareHouseDB.getDataBase(this@ProductListActivity)?.wareHouseDao()?.insertChallan(content)
+							WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()?.insertChallan(content)
 						}
 					}
 					viewModel.challanListLiveData.value = (list)
@@ -170,7 +170,7 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 				is RetrofitRepository.RequestType.PROCESS_FILE -> {
 					viewModel.isApiCalling.value = false
 					viewModel.challanListLiveData.value = arrayListOf()
-					viewModel.events.value = ProductListViewModel.EVENTS.MOVE_TO_SUCCESS
+					viewModel.events.value = DispatchViewModel.EVENTS.MOVE_TO_SUCCESS
 					
 				}
 				
@@ -197,6 +197,6 @@ class ProductListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClic
 	
 	override fun onChallanClick(challanRow: RowChallanViewModel) {
 		
-		viewModel.events.value = ProductListViewModel.EVENTS.SCAN(challanRow)
+		viewModel.events.value = DispatchViewModel.EVENTS.SCAN(challanRow)
 	}
 }

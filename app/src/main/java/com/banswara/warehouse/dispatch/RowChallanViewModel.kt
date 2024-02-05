@@ -1,4 +1,4 @@
-package com.banswara.warehouse.product_list
+package com.banswara.warehouse.dispatch
 
 import android.view.View
 import androidx.databinding.ObservableField

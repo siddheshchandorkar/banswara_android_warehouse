@@ -13,17 +13,17 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_banswara_logo_square"
         android:usesCleartextTraffic="true"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_banswara_logo_circular"
         android:supportsRtl="true"
         android:theme="@style/Theme.BanswaraWareHouse"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity" />
         <activity android:name="com.banswara.warehouse.login.LoginActivity" />
-        <activity android:name="com.banswara.warehouse.product_list.ProductListActivity" />
+        <activity android:name="com.banswara.warehouse.dispatch.DispatchListActivity" />
         <activity android:name="com.banswara.warehouse.dashboard.DashboardActivity" />
         <activity android:name="com.banswara.warehouse.splash.SplashScreenActivity"
             android:exported="true">
@@ -34,6 +34,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.banswara.warehouse.success.SuccessActivity" />
+        <activity android:name="com.banswara.warehouse.binning.BinningActivity" />
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"

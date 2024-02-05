@@ -1,16 +1,14 @@
-package com.banswara.warehouse.product_list
+package com.banswara.warehouse.dispatch
 
 import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.banswara.warehouse.dashboard.DashboardViewModel
 import com.banswara.warehouse.model.BaseRowModel
-import com.banswara.warehouse.model.FileContentModel
 import com.banswara.warehouse.model.LoginResponseModel
 import com.banswara.warehouse.utils.PreferenceManager
 
-class ProductListViewModel(file :String, app: Application): AndroidViewModel(app) {
+class DispatchViewModel(file :String, app: Application): AndroidViewModel(app) {
 	
 	var challanListLiveData: MutableLiveData<ArrayList<BaseRowModel>> =
 		MutableLiveData<ArrayList<BaseRowModel>>()
