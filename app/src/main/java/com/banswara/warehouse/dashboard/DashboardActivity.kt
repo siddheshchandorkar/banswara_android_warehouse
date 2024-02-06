@@ -2,6 +2,7 @@ package com.banswara.warehouse.dashboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -18,10 +19,11 @@ import com.banswara.warehouse.utils.PreferenceManager
 import com.banswara.warehouse.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
+class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick, RowBinningFilesViewModel.FileClick {
 	
 	private lateinit var viewModel: DashboardViewModel
 	private lateinit var binding: ActivityDashboardBinding
@@ -33,6 +35,8 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 		viewModel = DashboardViewModel(application)
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
+		
+		
 		
 		viewModel.events.observe(this) {
 			when (it) {
@@ -49,9 +53,14 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 					}
 				}
 				
-				DashboardViewModel.DASHBOARD_EVENTS.MOVE_TO_BINNING -> {
-					startActivity(Intent(this, BinningActivity::class.java))
+				is DashboardViewModel.DASHBOARD_EVENTS.MOVE_TO_BINNING -> {
+					val binningIntent = Intent(this, BinningActivity::class.java)
+					if(!TextUtils.isEmpty(it.fileName)){
+						binningIntent.putExtra(BinningActivity.KEY_FILE_NAME, it.fileName)
+					}
+					startActivity(binningIntent)
 				}
+				
 				
 				else -> {}
 			}
@@ -66,7 +75,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 					
 					it.fetchFilesResponseModel.forEach { file ->
 						list.add(RowFilesViewModel(file, this))
-						CoroutineScope(Dispatchers.Default).launch {
+						CoroutineScope(Dispatchers.IO).launch {
 							Log.d("Siddhesh", "File Inserted : "+WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()?.insertFile(file))
 						}
 					}
@@ -82,18 +91,38 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 					viewModel.isDispatch.value =false
 					viewModel.title.value= PreferenceManager.getUser()?.userName?:""
 					
+				}else if(viewModel.isBinning.value!!){
+					viewModel.isBinning.value =false
+					viewModel.title.value= PreferenceManager.getUser()?.userName?:""
+					
 				}else
 				finish()
 			}
 		})
 		
+//		CoroutineScope(Dispatchers.IO).launch {
+//			val list = WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()
+//				?.getBinningFileList()
+//			Log.d("Siddhesh", "Checking files : "+list)
+//			viewModel.binningFileListLiveData.value = arrayListOf()
+//			list?.let {
+//
+//				val tempList = arrayListOf<BaseRowModel>()
+//				it.forEach {
+//					tempList.add(RowBinningFilesViewModel(it,this@DashboardActivity))
+//				}
+//				viewModel.binningFileListLiveData.value = (tempList)
+//			}
+//			Log.d("Siddhesh", "binningFileListLiveData : "+viewModel.binningFileListLiveData.value)
+//
+//		}
 		
 		
 	}
 	
 	override fun onFileSelect(challanFileModel: ChallanFileModel) {
 		challanFileModel.fileStatus = "In Progress"
-		CoroutineScope(Dispatchers.Default).launch {
+		CoroutineScope(Dispatchers.IO).launch {
 			WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()?.updateFileStatus(challanFileModel)
 		}
 		val intent = Intent(this, DispatchListActivity::class.java)
@@ -105,6 +134,10 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick {
 		super.onResume()
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_FILES
 		
+	}
+	
+	override fun onFileSelect(fileName: String) {
+		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.MOVE_TO_BINNING(fileName)
 	}
 	
 	

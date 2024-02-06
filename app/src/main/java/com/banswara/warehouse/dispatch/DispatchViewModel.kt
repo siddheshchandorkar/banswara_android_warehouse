@@ -31,6 +31,6 @@ class DispatchViewModel(file :String, app: Application): AndroidViewModel(app) {
 		data object FETCH_FILE_CONTENT : EVENTS()
 		data object PROCESS_FILE : EVENTS()
 		data object MOVE_TO_SUCCESS : EVENTS()
-		data class SCAN(val challanRow: RowChallanViewModel) : EVENTS()
+//		data class SCAN(val challanRow: RowChallanViewModel) : EVENTS()
 	}
 }

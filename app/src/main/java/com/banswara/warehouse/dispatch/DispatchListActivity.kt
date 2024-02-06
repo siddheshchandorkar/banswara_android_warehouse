@@ -1,8 +1,10 @@
 package com.banswara.warehouse.dispatch
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -19,17 +21,23 @@ import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.success.SuccessActivity
 import com.banswara.warehouse.utils.StatusRetention
 import com.banswara.warehouse.utils.Utils
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.client.android.BeepManager
+import com.journeyapps.barcodescanner.CaptureManager
+import com.journeyapps.barcodescanner.DecoratedBarcodeView
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
+import java.util.Arrays
+import java.util.Random
 
 class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClick {
 	
 	private lateinit var viewModel: DispatchViewModel
 	private lateinit var binding: ActivityDispatchBinding
+	private var capture: CaptureManager? = null
 	
 	
 	private var successLauncher = registerForActivityResult<Intent, ActivityResult>(
@@ -63,13 +71,61 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 			}
 		}
 		
-		val options = GmsBarcodeScannerOptions.Builder()
-			.setBarcodeFormats(
-				Barcode.FORMAT_QR_CODE,
-				Barcode.FORMAT_AZTEC
-			)
-			.build()
-		val scanner = GmsBarcodeScanning.getClient(this, options)
+		capture = CaptureManager(this, binding.zxingBarcodeScanner)
+		capture?.initializeFromIntent(intent, savedInstanceState)
+		capture?.setShowMissingCameraPermissionDialog(false)
+		capture?.decode()
+		changeLaserVisibility()
+		
+		
+		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
+			
+			var allChallanScan = true
+			barcode.text?.let { code ->
+				Toast.makeText(this, barcode.text, Toast.LENGTH_SHORT).show()
+				capture?.onPause()
+				
+				try {
+					Handler(mainLooper).post {
+						val list: ArrayList<BaseRowModel> =
+							viewModel.challanListLiveData.value!!
+						viewModel.challanListLiveData.value?.forEach {
+							if (it is RowChallanViewModel) {
+								if (it.challanNo.get() == code && it.status.get() != StatusRetention.SCANNED) {
+									list.remove(it)
+									it.status.set(StatusRetention.SCANNED)
+									list.add(it)
+									it.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
+									WareHouseDB.getDataBase(this@DispatchListActivity)
+										?.wareHouseDao()?.updateChallanStatus(it.challanFileModel)
+									
+								}
+								
+							}
+						}
+						
+						viewModel.challanListLiveData.value = list
+						viewModel.challanListLiveData.value?.forEach {
+							if (it is RowChallanViewModel) {
+								if (it.status.get() != StatusRetention.SCANNED) {
+									allChallanScan = false
+								}
+							}
+						}
+						viewModel.allScanned.value = allChallanScan
+						
+						
+					}
+					
+				}catch (e: Exception){
+					e.printStackTrace()
+				}
+				
+				finally {
+					capture?.onResume()
+				}
+			}
+		}
 		
 		viewModel.events.observe(this) {
 			when (it) {
@@ -82,52 +138,6 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 							viewModel.fileName.value!!
 						)
 					}
-				}
-				
-				
-				is DispatchViewModel.EVENTS.SCAN -> {
-					
-					scanner.startScan()
-						.addOnSuccessListener { barcode ->
-							Log.d("ProductListActivity", "Scan Success")
-							var allChallanScan = true
-							// Task completed successfully
-							barcode.rawValue?.let { code ->
-								if (code == it.challanRow.challanNo.get()) {
-									
-									Toast.makeText(this, code + " is Scanned", Toast.LENGTH_LONG)
-										.show()
-									val list: ArrayList<BaseRowModel> =
-										viewModel.challanListLiveData.value!!
-									list.remove(it.challanRow as BaseRowModel)
-									it.challanRow.status.set(StatusRetention.SCANNED)
-									list.add(it.challanRow)
-									viewModel.challanListLiveData.value = list
-									CoroutineScope(Dispatchers.Default).launch {
-										it.challanRow.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
-										 WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()?.updateChallanStatus(it.challanRow.challanFileModel)
-									}
-								}
-								
-								viewModel.challanListLiveData.value?.forEach {
-									if ((it as RowChallanViewModel).status.get() != StatusRetention.SCANNED) {
-										allChallanScan = false
-									}
-								}
-								viewModel.allScanned.value = allChallanScan
-								
-							}
-						}
-						.addOnCanceledListener {
-							// Task canceled
-							Log.d("ProductListActivity", "Scan Cancel")
-						}
-						.addOnFailureListener { e ->
-							// Task failed with an exception
-							Log.d("ProductListActivity", "Scan Failed : " + e.message)
-							
-						}
-					
 				}
 				
 				DispatchViewModel.EVENTS.PROCESS_FILE -> {
@@ -159,7 +169,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 						content.fileName = viewModel.fileName.value!!
 						content.fileStatus = StatusRetention.STATUS_PENDING
 						list.add(RowChallanViewModel(content, this))
-						CoroutineScope(Dispatchers.Default).launch {
+						CoroutineScope(Dispatchers.IO).launch {
 							WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()?.insertChallan(content)
 						}
 					}
@@ -189,14 +199,54 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		}
 		return super.onOptionsItemSelected(item)
 	}
+	private fun changeMaskColor() {
+		val rnd = Random()
+		val color = Color.argb(100, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+		binding.zxingBarcodeScanner.viewFinder.setMaskColor(color)
+	}
+	
+	private fun changeLaserVisibility() {
+		binding.zxingBarcodeScanner.viewFinder.setLaserVisibility(true)
+	}
+	
+	override fun onResume() {
+		super.onResume()
+		capture?.onResume()
+	}
+	
+	override fun onPause() {
+		super.onPause()
+		capture?.onPause()
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		capture?.onDestroy()
+	}
 	
 	
+	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+		return binding.zxingBarcodeScanner.onKeyDown(keyCode, event) || super.onKeyDown(
+			keyCode,
+			event
+		)
+	}
+	
+	
+	override fun onRequestPermissionsResult(
+		requestCode: Int,
+		permissions: Array<String?>,
+		grantResults: IntArray
+	) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+		capture?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+	}
 	companion object {
 		const val KEY_FILE_NAME = "file_name"
 	}
 	
 	override fun onChallanClick(challanRow: RowChallanViewModel) {
 		
-		viewModel.events.value = DispatchViewModel.EVENTS.SCAN(challanRow)
+//		viewModel.events.value = DispatchViewModel.EVENTS.SCAN(challanRow)
 	}
 }

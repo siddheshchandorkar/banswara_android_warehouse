@@ -32,7 +32,6 @@
                 app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
-
         <TextView
             android:id="@+id/tv_location"
             android:layout_width="match_parent"
@@ -43,14 +42,18 @@
             android:textAllCaps="true"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/app_bar" />
+            app:layout_constraintTop_toBottomOf="@id/app_bar"/>
 
         <LinearLayout
             android:id="@+id/ll_file_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_location">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -72,7 +75,7 @@
                     android:letterSpacing="0.8"
                     android:maxLength="3"
                     android:maxLines="1"
-                    android:text="@{vm.first}"
+                    android:text="@={vm.first}"
                     android:textSize="16sp"
                     tools:text="123" />
 
@@ -96,7 +99,7 @@
                     android:letterSpacing="0.8"
                     android:maxLength="3"
                     android:maxLines="1"
-                    android:text="@{vm.second}" />
+                    android:text="@={vm.second}" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -112,12 +115,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionDone"
                     android:inputType="number"
                     android:letterSpacing="0.8"
                     android:maxLength="3"
                     android:maxLines="1"
-                    android:text="@{vm.third}" />
+                    android:text="@={vm.third}" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -125,12 +128,14 @@
 
         <com.journeyapps.barcodescanner.DecoratedBarcodeView
             android:id="@+id/zxing_barcode_scanner"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ll_file_name"
-            app:zxing_scanner_layout="@layout/custom_barcode_scanner">
-        </com.journeyapps.barcodescanner.DecoratedBarcodeView>
+            app:zxing_scanner_layout="@layout/custom_barcode_scanner" />
+
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -140,9 +145,11 @@
             android:layout_margin="8dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layout_constraintBottom_toTopOf="@id/btn_shipped"
             app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner"
             app:setRowData="@{vm.challanListLiveData}" />
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_shipped"

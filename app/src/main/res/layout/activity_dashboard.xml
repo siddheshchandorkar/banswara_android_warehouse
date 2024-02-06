@@ -19,15 +19,15 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
             android:elevation="5dp"
-            app:elevation="5dp">
+            app:elevation="5dp"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleTextColor="@color/c_113656"
-                app:title="@{vm.title}"/>
+                app:title="@{vm.title}"
+                app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
 
@@ -36,33 +36,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:onClick="@{vm.binningClick}"
+            android:visibility="@{!vm.isBinning &amp;&amp; !vm.isDispatch}"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="5dp"
-            android:onClick="@{vm.binningClick}"
             app:cardElevation="2dp"
-            android:visibility="@{!vm.isDispatch}"
-            app:layout_constraintTop_toBottomOf="@id/app_bar"
             app:layout_constraintStart_toStartOf="parent"
-            >
+            app:layout_constraintTop_toBottomOf="@id/app_bar">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:background="@drawable/background_border_round">
+                android:background="@drawable/background_border_round"
+                android:padding="16dp">
 
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Binning \nProcess"
+                    android:fontFamily="@font/font_bold"
                     android:gravity="center"
+                    android:text="Binning \nProcess"
                     android:textAllCaps="true"
-                    app:layout_constraintTop_toTopOf="parent"
                     android:textColor="@color/c_113656"
                     android:textSize="16sp"
-                    android:fontFamily="@font/font_bold"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -73,33 +72,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:onClick="@{vm.dispatchClick}"
+            android:visibility="@{!vm.isBinning &amp;&amp; !vm.isDispatch}"
             app:cardBackgroundColor="@color/c_113656"
             app:cardCornerRadius="5dp"
             app:cardElevation="2dp"
-            android:onClick="@{vm.dispatchClick}"
-            android:visibility="@{!vm.isDispatch}"
-            app:layout_constraintTop_toBottomOf="@id/cv_binning"
             app:layout_constraintStart_toStartOf="parent"
-            >
+            app:layout_constraintTop_toBottomOf="@id/cv_binning">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:background="@drawable/bg_round_blue">
+                android:background="@drawable/bg_round_blue"
+                android:padding="16dp">
 
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Dispatch \nProcess"
+                    android:fontFamily="@font/font_bold"
                     android:gravity="center"
+                    android:text="Dispatch \nProcess"
                     android:textAllCaps="true"
-                    app:layout_constraintTop_toTopOf="parent"
                     android:textColor="@color/white"
                     android:textSize="16sp"
-                    android:fontFamily="@font/font_bold"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -113,10 +111,22 @@
             android:layout_margin="8dp"
             android:orientation="vertical"
             android:visibility="@{vm.isDispatch}"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/app_bar"
             app:setRowData="@{vm.fileListLiveData}" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_binning_files"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:orientation="vertical"
+            android:visibility="@{vm.isBinning}"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/app_bar"
+            app:setRowData="@{vm.binningFileListLiveData}" />
 
         <LinearLayout
             android:layout_width="match_parent"

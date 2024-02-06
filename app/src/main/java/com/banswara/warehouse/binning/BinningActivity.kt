@@ -1,19 +1,15 @@
 package com.banswara.warehouse.binning
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
+import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
-import com.banswara.warehouse.dashboard.RowFilesViewModel
 import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityBinningBinding
 import com.banswara.warehouse.model.BaseRowModel
@@ -30,7 +26,6 @@ class BinningActivity : AppCompatActivity() {
 	
 	private lateinit var viewModel: BinningViewModel
 	private lateinit var binding: ActivityBinningBinding
-	private var beepManager: BeepManager? = null
 	private var capture: CaptureManager? = null
 
 
@@ -55,6 +50,7 @@ class BinningActivity : AppCompatActivity() {
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
 		
+		
 		supportActionBar?.let {
 			if (supportActionBar == null) {
 				setSupportActionBar(binding.toolbar)
@@ -63,21 +59,6 @@ class BinningActivity : AppCompatActivity() {
 				it.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.ic_back))
 			}
 		}
-		beepManager = BeepManager(this)
-		
-//		if (checkPermission()) {
-//			val formats: Collection<BarcodeFormat> =
-//				listOf(BarcodeFormat.QR_CODE, BarcodeFormat.CODE_39)
-//			binding.barcode.barcodeView.decoderFactory = DefaultDecoderFactory(formats)
-//			binding.barcode.initializeFromIntent(intent)
-//			binding.barcode.decodeContinuous {
-//				Toast.makeText(this, it.text, Toast.LENGTH_LONG).show()
-//				beepManager?.playBeepSoundAndVibrate()
-//			}
-//		} else {
-//			requestPermission()
-//		}
-		
 		
 		capture = CaptureManager(this, binding.zxingBarcodeScanner)
 		capture?.initializeFromIntent(intent, savedInstanceState)
@@ -86,14 +67,72 @@ class BinningActivity : AppCompatActivity() {
 		changeLaserVisibility()
 		val list = arrayListOf<BaseRowModel>()
 		
-		binding.zxingBarcodeScanner.decodeContinuous {
-			Toast.makeText(this,it.text, Toast.LENGTH_LONG).show()
+		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
+			if (viewModel.locationValidation()) {
+				
+				Toast.makeText(this, barcode.text, Toast.LENGTH_LONG).show()
 //			beepManager?.playBeepSoundAndVibrate()
-			list.add(RowBinningViewModel(BinningModel(it.text)))
-			viewModel.challanListLiveData.value = (list)
+				var contains = false
+				list.forEach {
+					if (it is RowBinningViewModel) {
+						if (it.binningModel.fileContent.equals(barcode.text)) {
+							contains = true
+						}
+					}
+				}
+				if (!contains) {
+					val binningModel: BinningModel
+					if (!TextUtils.isEmpty(viewModel.fileName.value)) {
+						binningModel = BinningModel(
+							fileContent = barcode.text,
+							fileName = viewModel.fileName.value!!
+						)
+					} else {
+						binningModel = BinningModel(
+							fileContent = barcode.text,
+							fileName = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!
+						)
+					}
+					list.add(RowBinningViewModel(binningModel))
+					viewModel.challanListLiveData.value = (list)
+					
+					CoroutineScope(Dispatchers.IO).launch {
+						WareHouseDB.getDataBase(this@BinningActivity)?.wareHouseDao()
+							?.insertBinningChallan(binningModel)
+					}
+					
+				}
+			}
+			
 			
 		}
+		
+		viewModel.events.observe(this) {
+			when (it) {
+				
+				BinningViewModel.EVENTS.FETCH_FILE_CONTENT -> {
+//					viewModel.user?.let { user ->
+//						CoroutineScope(Dispatchers.IO).launch {
+//							viewModel.isApiCalling.postValue(true)
+//							RetrofitRepository.instance.fetchFiles(
+//								user.userId,
+//								Utils.getDeviceId(contentResolver)
+//							)
+//						}
+//					}
+				}
+				
+				is BinningViewModel.EVENTS.SHOW_TOAST -> {
+					Toast.makeText(this, it.msg, Toast.LENGTH_LONG).show()
+				}
+				
+				
+				else -> {}
+			}
+		}
+		
 	}
+	
 	private fun changeMaskColor() {
 		val rnd = Random()
 		val color = Color.argb(100, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
@@ -121,7 +160,10 @@ class BinningActivity : AppCompatActivity() {
 	
 	
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-		return binding.zxingBarcodeScanner.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
+		return binding.zxingBarcodeScanner.onKeyDown(keyCode, event) || super.onKeyDown(
+			keyCode,
+			event
+		)
 	}
 	
 	
@@ -133,6 +175,7 @@ class BinningActivity : AppCompatActivity() {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 		capture?.onRequestPermissionsResult(requestCode, permissions, grantResults)
 	}
+	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			android.R.id.home -> {
