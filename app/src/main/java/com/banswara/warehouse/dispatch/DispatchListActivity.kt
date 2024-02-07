@@ -3,7 +3,7 @@ package com.banswara.warehouse.dispatch
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.widget.Toast
@@ -21,16 +21,10 @@ import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.success.SuccessActivity
 import com.banswara.warehouse.utils.StatusRetention
 import com.banswara.warehouse.utils.Utils
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.client.android.BeepManager
 import com.journeyapps.barcodescanner.CaptureManager
-import com.journeyapps.barcodescanner.DecoratedBarcodeView
-import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.util.Arrays
 import java.util.Random
 
 class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanClick {
@@ -77,53 +71,92 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		capture?.decode()
 		changeLaserVisibility()
 		
+		viewModel.challanListLiveData.observe(this) {
+			var allChallanScan = true
+			it?.let { list ->
+				list.forEach {
+					if (it is RowChallanViewModel) {
+						Log.d(
+							"Siddhesh",
+							"Checking status " + it.challanNo.get() + ": " + it.status.get()
+						)
+						if (it.status.get() != StatusRetention.SCANNED) {
+							allChallanScan = false
+						}
+					}
+				}
+				
+			}
+			viewModel.allScanned.value = allChallanScan
+			
+		}
+		
 		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
 			
-			var allChallanScan = true
 			barcode.text?.let { code ->
 				Toast.makeText(this, barcode.text, Toast.LENGTH_SHORT).show()
 				capture?.onPause()
 				
 				try {
-					Handler(mainLooper).post {
-						val list: ArrayList<BaseRowModel> =
-							viewModel.challanListLiveData.value!!
-						viewModel.challanListLiveData.value?.forEach {
-							if (it is RowChallanViewModel) {
-								if (it.challanNo.get() == code && it.status.get() != StatusRetention.SCANNED) {
-									list.remove(it)
-									it.status.set(StatusRetention.SCANNED)
-									list.add(it)
-									it.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
+					
+					val list: ArrayList<BaseRowModel> =
+						viewModel.challanListLiveData.value!!
+					list.forEach {
+						if (it is RowChallanViewModel) {
+							if (it.challanNo.get() == code && it.status.get() != StatusRetention.SCANNED) {
+								list.remove(it)
+								
+								it.status.set(StatusRetention.SCANNED)
+								it.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
+								list.add(it)
+								
+								//status change to update in db
+								CoroutineScope(Dispatchers.IO).launch {
 									WareHouseDB.getDataBase(this@DispatchListActivity)
 										?.wareHouseDao()?.updateChallanStatus(it.challanFileModel)
 									
 								}
 								
+								
 							}
+//							if (it.status.get() != StatusRetention.SCANNED) {
+//								Log.d("Siddhesh", "Checking status " + it.status.get())
+//								allChallanScan = false
+//							}
 						}
-						
-						viewModel.challanListLiveData.value = list
-						viewModel.challanListLiveData.value?.forEach {
-							if (it is RowChallanViewModel) {
-								if (it.status.get() != StatusRetention.SCANNED) {
-									allChallanScan = false
-								}
-							}
-						}
-						viewModel.allScanned.value = allChallanScan
-						
-						
 					}
+//					CoroutineScope(Dispatchers.Default).launch {
+//						list.forEach {
+//							if (it is RowChallanViewModel) {
+//								Log.d(
+//									"Siddhesh",
+//									"Checking status " + it.challanNo.get() + ": " + it.status.get()
+//								)
+//								if (it.status.get() != StatusRetention.SCANNED) {
+//									allChallanScan = false
+//								}
+//							}
+//						}
+//						Log.d("Siddhesh", "Checking status " + allChallanScan)
+//						if (allChallanScan) {
+////						capture?.onPause()
+////							binding.zxingBarcodeScanner.visibility = View.GONE
+////							Toast.makeText(this@DispatchListActivity, "All Challans are scanner", Toast.LENGTH_SHORT).show()
+//						}
+//						viewModel.allScanned.value = allChallanScan
+//
+//					}
+					viewModel.challanListLiveData.value = list
+					capture?.onResume()
 					
-				}catch (e: Exception){
-					e.printStackTrace()
-				}
-				
-				finally {
+				} catch (e: Throwable) {
+					Log.d("Siddhesh", "Checking Crash " + e.message)
+					
+					
 					capture?.onResume()
 				}
+				
 			}
 		}
 		
@@ -170,7 +203,8 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 						content.fileStatus = StatusRetention.STATUS_PENDING
 						list.add(RowChallanViewModel(content, this))
 						CoroutineScope(Dispatchers.IO).launch {
-							WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()?.insertChallan(content)
+							WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()
+								?.insertChallan(content)
 						}
 					}
 					viewModel.challanListLiveData.value = (list)
@@ -199,6 +233,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		}
 		return super.onOptionsItemSelected(item)
 	}
+	
 	private fun changeMaskColor() {
 		val rnd = Random()
 		val color = Color.argb(100, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
@@ -241,12 +276,13 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 		capture?.onRequestPermissionsResult(requestCode, permissions, grantResults)
 	}
+	
 	companion object {
 		const val KEY_FILE_NAME = "file_name"
 	}
 	
 	override fun onChallanClick(challanRow: RowChallanViewModel) {
-		
+
 //		viewModel.events.value = DispatchViewModel.EVENTS.SCAN(challanRow)
 	}
 }

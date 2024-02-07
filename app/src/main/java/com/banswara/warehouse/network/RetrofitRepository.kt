@@ -78,6 +78,33 @@ class RetrofitRepository {
 				}
 			})
 	}
+	suspend fun callDeviceChange(pin: Long, deviceId: String, mobile: String, userName: String) {
+		
+		retrofitService.changeUserDevice(DeviceChangeRequestModel(true, pin, deviceId, mobile, userName))
+			.enqueue(object : Callback<BaseResponseModel> {
+				
+				override fun onResponse(
+					call: Call<BaseResponseModel>,
+					response: Response<BaseResponseModel>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.DEVICE_CHANGE(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<BaseResponseModel>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
 	
 	suspend fun fetchFiles(useId: Int, deviceId: String) {
 		

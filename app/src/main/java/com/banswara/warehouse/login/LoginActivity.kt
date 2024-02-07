@@ -11,9 +11,7 @@ import com.banswara.warehouse.R
 import com.banswara.warehouse.dashboard.DashboardActivity
 import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityLoginBinding
-import com.banswara.warehouse.model.LoginResponseModel
 import com.banswara.warehouse.network.RetrofitRepository
-import com.banswara.warehouse.success.SuccessActivity
 import com.banswara.warehouse.utils.PreferenceManager
 import com.banswara.warehouse.utils.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -86,12 +84,22 @@ class LoginActivity : AppCompatActivity() {
 				
 				LoginViewModel.LoginEvents.SIGN_IN -> {
 					CoroutineScope(Dispatchers.IO).launch {
-						RetrofitRepository.instance.callSignUpApi(
-							viewModel.pin.value!!.toLong(),
-							Utils.getDeviceId(contentResolver),
-							viewModel.mobileNumber.value!!,
-							viewModel.userName.value!!
-						)
+						if(viewModel.isDeviceNotRegistered.value == false){
+							RetrofitRepository.instance.callSignUpApi(
+								viewModel.pin.value!!.toLong(),
+								Utils.getDeviceId(contentResolver),
+								viewModel.mobileNumber.value!!,
+								viewModel.userName.value!!
+							)
+						}else{
+							RetrofitRepository.instance.callDeviceChange(
+								viewModel.pin.value!!.toLong(),
+								Utils.getDeviceId(contentResolver),
+								viewModel.mobileNumber.value!!,
+								viewModel.userName.value!!
+							)
+						}
+						
 					}
 				}
 				
@@ -103,26 +111,53 @@ class LoginActivity : AppCompatActivity() {
 		RetrofitRepository.instance.apiLiveData.observe(this) {
 			when (it) {
 				is RetrofitRepository.RequestType.DEVICE_CHANGE -> {
-					Toast.makeText(this, "Device Changed Successfully", Toast.LENGTH_LONG).show()
+					if(it.baseResponseModel.errorMsg.equals("Change device id successfully.", true)){
+						Toast.makeText(this, "Change device id successfully. Please login with PIN.", Toast.LENGTH_LONG).show()
+						viewModel.isLogin.value =true
+						viewModel.pin.value = ""
+					}else{
+						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG).show()
+						
+					}
 				}
 				
 				is RetrofitRepository.RequestType.LOGIN -> {
-						
+					
+					if (it.loginResponse.errorMsg.equals("Success", true)) {
 						WareHouseDB.getDataBase(this)?.wareHouseDao()?.insert(it.loginResponse)
 						
-						Toast.makeText(this, it.loginResponse.errorMsg, Toast.LENGTH_LONG)
+						Toast.makeText(this, "Login Success", Toast.LENGTH_LONG)
 							.show()
 						PreferenceManager.saveUser(it.loginResponse)
 						PreferenceManager.getUser()?.let {
 							startActivity(Intent(this, DashboardActivity::class.java))
 						}
+					} else if (it.loginResponse.errorMsg.equals(
+							"Device id is not register",
+							true
+						)
+					) {
+						viewModel.pin.value = ""
+						viewModel.isLogin.value = false
+						viewModel.isDeviceNotRegistered.value  = true
+						Toast.makeText(
+							this,
+							"This device not registered. Please Sign Up with this device",
+							Toast.LENGTH_LONG
+						).show()
+						
+					} else {
+						Toast.makeText(this, it.loginResponse.errorMsg, Toast.LENGTH_LONG)
+							.show()
+					}
+					
 					
 				}
 				
 				is RetrofitRepository.RequestType.SIGN_UP -> {
 					viewModel.isLogin.value = true
-					viewModel.userName.value =""
-					viewModel.pin.value =""
+					viewModel.userName.value = ""
+					viewModel.pin.value = ""
 				}
 				
 				else -> {

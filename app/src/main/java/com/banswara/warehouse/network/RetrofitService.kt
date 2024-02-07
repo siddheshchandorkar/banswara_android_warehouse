@@ -31,6 +31,6 @@ interface RetrofitService {
 	fun processFile(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<ProcessFileResponseModel>
  
 	@POST("/Api/AppApi/Fn_Change_User_Device")
-	fun changeUserDevice(@Body deviceChangeRequestModel: DeviceChangeRequestModel): Call<LoginResponseModel>
+	fun changeUserDevice(@Body deviceChangeRequestModel: DeviceChangeRequestModel): Call<BaseResponseModel>
 	
 }

@@ -100,23 +100,20 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick, RowB
 			}
 		})
 		
+		//To fetch local binning files
 //		CoroutineScope(Dispatchers.IO).launch {
 //			val list = WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()
 //				?.getBinningFileList()
-//			Log.d("Siddhesh", "Checking files : "+list)
 //			viewModel.binningFileListLiveData.value = arrayListOf()
 //			list?.let {
-//
 //				val tempList = arrayListOf<BaseRowModel>()
 //				it.forEach {
 //					tempList.add(RowBinningFilesViewModel(it,this@DashboardActivity))
 //				}
 //				viewModel.binningFileListLiveData.value = (tempList)
 //			}
-//			Log.d("Siddhesh", "binningFileListLiveData : "+viewModel.binningFileListLiveData.value)
-//
 //		}
-		
+//
 		
 	}
 	

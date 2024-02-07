@@ -3,8 +3,6 @@ package com.banswara.warehouse.model
 import com.google.gson.annotations.SerializedName
 
 data class DeviceChangeRequestModel(
-	@SerializedName("UserId")
-	val userId: Int,
 	@SerializedName("bActiveStatus")
 	val activeStatus: Boolean,
 	@SerializedName("nPinNo")

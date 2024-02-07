@@ -13,6 +13,7 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	val userNameError = MutableLiveData<String>()
 	val mobileNumber = MutableLiveData<String>()
 	val isLogin = MutableLiveData<Boolean>(true)
+	val isDeviceNotRegistered = MutableLiveData<Boolean>(false)
 	val loginEnable = MutableLiveData<Boolean>(false)
 	val signInEnable = MutableLiveData<Boolean>(false)
 	val pin = MutableLiveData<String>()
@@ -38,11 +39,7 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	}
 	
 	 fun checkLoginValidations(showError: Boolean): Boolean {
-		if (TextUtils.isEmpty(userName.value)) {
-			if(showError)
-			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_user_name))
-			return false
-		}else if (TextUtils.isEmpty(pin.value)) {
+		if (TextUtils.isEmpty(pin.value)) {
 			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_pin))
 			return false
