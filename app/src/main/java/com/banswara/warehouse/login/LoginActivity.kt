@@ -3,6 +3,7 @@ package com.banswara.warehouse.login
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -62,6 +63,16 @@ class LoginActivity : AppCompatActivity() {
 				viewModel.signInEnable.value = viewModel.checkSignInValidations(false)
 			}
 		}
+		
+		onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+			override fun handleOnBackPressed() {
+				if(!viewModel.isLogin.value!!) {
+					viewModel.isLogin.value = true
+				}else{
+					finish()
+				}
+			}
+		})
 		
 		//Login Screen Events Observers
 		viewModel.events.observe(this) {
@@ -131,6 +142,7 @@ class LoginActivity : AppCompatActivity() {
 						PreferenceManager.saveUser(it.loginResponse)
 						PreferenceManager.getUser()?.let {
 							startActivity(Intent(this, DashboardActivity::class.java))
+							finish()
 						}
 					} else if (it.loginResponse.errorMsg.equals(
 							"Device id is not register",
@@ -166,6 +178,6 @@ class LoginActivity : AppCompatActivity() {
 			}
 		}
 		
-		
 	}
+	
 }

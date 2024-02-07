@@ -89,11 +89,11 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick, RowB
 			override fun handleOnBackPressed() {
 				if(viewModel.isDispatch.value!!){
 					viewModel.isDispatch.value =false
-					viewModel.title.value= PreferenceManager.getUser()?.userName?:""
+					viewModel.title.value="Hi, "+ PreferenceManager.getUser()?.userName?:""
 					
 				}else if(viewModel.isBinning.value!!){
 					viewModel.isBinning.value =false
-					viewModel.title.value= PreferenceManager.getUser()?.userName?:""
+					viewModel.title.value= "Hi, "+PreferenceManager.getUser()?.userName?:""
 					
 				}else
 				finish()
