@@ -18,7 +18,7 @@ class BinningViewModel(app: Application) : AndroidViewModel(app) {
 	var fileName: MutableLiveData<String> = MutableLiveData<String>()
 	
 	val isApiCalling: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-	val allScanned: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+	val submitEnable: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
 	val user: LoginResponseModel? = PreferenceManager.getUser()
 	
 	var first: MutableLiveData<String> = MutableLiveData<String>()

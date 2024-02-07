@@ -67,6 +67,10 @@ class BinningActivity : AppCompatActivity() {
 		changeLaserVisibility()
 		val list = arrayListOf<BaseRowModel>()
 		
+		viewModel.challanListLiveData.observe(this) {
+			viewModel.submitEnable.value = it.isNotEmpty()
+		}
+		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
 			if (viewModel.locationValidation()) {
 				

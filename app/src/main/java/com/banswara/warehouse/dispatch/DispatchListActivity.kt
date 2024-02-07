@@ -70,46 +70,49 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		capture?.setShowMissingCameraPermissionDialog(false)
 		capture?.decode()
 		changeLaserVisibility()
-		
-		viewModel.challanListLiveData.observe(this) {
-			var allChallanScan = true
-			it?.let { list ->
-				list.forEach {
-					if (it is RowChallanViewModel) {
-						Log.d(
-							"Siddhesh",
-							"Checking status " + it.challanNo.get() + ": " + it.status.get()
-						)
-						if (it.status.get() != StatusRetention.SCANNED) {
-							allChallanScan = false
-						}
-					}
-				}
-				
-			}
-			viewModel.allScanned.value = allChallanScan
-			
-		}
+
+//		viewModel.challanListLiveData.observe(this) {
+//			var allChallanScan = true
+//				it?.let { list ->
+//					list.forEach {
+//						if (it is RowChallanViewModel) {
+//							Log.d(
+//								"Siddhesh",
+//								"Checking status " + it.challanNo.get() + ": " + it.status.get()
+//							)
+//							if (it.status.get() != StatusRetention.SCANNED) {
+//								allChallanScan = false
+//							}
+//						}
+//					}
+//
+//				}
+//				viewModel.allScanned.value = allChallanScan
+//
+//		}
 		
 		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
-			
+			var allChallanScan = true
 			barcode.text?.let { code ->
 				Toast.makeText(this, barcode.text, Toast.LENGTH_SHORT).show()
 				capture?.onPause()
 				
 				try {
+					val list: ArrayList<BaseRowModel> = ArrayList()
+					viewModel.challanListLiveData.value?.forEach {
+						list.add(it)
+					}
 					
-					val list: ArrayList<BaseRowModel> =
-						viewModel.challanListLiveData.value!!
 					list.forEach {
 						if (it is RowChallanViewModel) {
 							if (it.challanNo.get() == code && it.status.get() != StatusRetention.SCANNED) {
-								list.remove(it)
+//									rowScanned = it
 								
 								it.status.set(StatusRetention.SCANNED)
+								it.statusValue = StatusRetention.SCANNED
 								it.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
-								list.add(it)
+								
 								
 								//status change to update in db
 								CoroutineScope(Dispatchers.IO).launch {
@@ -120,40 +123,21 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 								
 								
 							}
-//							if (it.status.get() != StatusRetention.SCANNED) {
-//								Log.d("Siddhesh", "Checking status " + it.status.get())
-//								allChallanScan = false
-//							}
+							if (it.status.get() != StatusRetention.SCANNED) {
+								allChallanScan = false
+							}
 						}
 					}
-//					CoroutineScope(Dispatchers.Default).launch {
-//						list.forEach {
-//							if (it is RowChallanViewModel) {
-//								Log.d(
-//									"Siddhesh",
-//									"Checking status " + it.challanNo.get() + ": " + it.status.get()
-//								)
-//								if (it.status.get() != StatusRetention.SCANNED) {
-//									allChallanScan = false
-//								}
-//							}
-//						}
-//						Log.d("Siddhesh", "Checking status " + allChallanScan)
-//						if (allChallanScan) {
-////						capture?.onPause()
-////							binding.zxingBarcodeScanner.visibility = View.GONE
-////							Toast.makeText(this@DispatchListActivity, "All Challans are scanner", Toast.LENGTH_SHORT).show()
-//						}
-//						viewModel.allScanned.value = allChallanScan
-//
-//					}
+					
+					Log.d("Siddhesh", "Checking status after scan " + allChallanScan)
+					
+					list.sortBy { (it as RowChallanViewModel).statusValue }
 					viewModel.challanListLiveData.value = list
+					viewModel.allScanned.value = allChallanScan
+					
 					capture?.onResume()
 					
 				} catch (e: Throwable) {
-					Log.d("Siddhesh", "Checking Crash " + e.message)
-					
-					
 					capture?.onResume()
 				}
 				

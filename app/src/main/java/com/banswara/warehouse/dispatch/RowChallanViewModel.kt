@@ -12,6 +12,7 @@ class RowChallanViewModel( val challanFileModel: FileContentModel, private val c
 	val challanNo: ObservableField<String> = ObservableField(challanFileModel.fileContent)
 	val isSelected: ObservableField<Boolean> = ObservableField(false)
 	val status: ObservableField<Int> = ObservableField<Int>(StatusRetention.PENDING)
+	var statusValue = StatusRetention.PENDING
 	override fun setLayoutID() {
 		layoutID = R.layout.row_challan
 	}
@@ -19,6 +20,7 @@ class RowChallanViewModel( val challanFileModel: FileContentModel, private val c
 	fun onChallanSelected(view : View){
 		challanClick.onChallanClick(this)
 	}
+	
 	
 	interface ChallanClick{
 		fun onChallanClick(challanRow: RowChallanViewModel)

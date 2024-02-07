@@ -161,6 +161,7 @@
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.onShipped}"
             android:text="@string/submit"
+            android:enabled="@{vm.submitEnable}"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent" />
 
