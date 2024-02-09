@@ -19,14 +19,13 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="5dp"
-            app:elevation="5dp"
+            android:background="@color/white"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@{vm.title}"
                 app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -104,6 +103,7 @@
         </androidx.cardview.widget.CardView>
 
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv_files"
             android:layout_width="match_parent"
@@ -116,6 +116,37 @@
             app:layout_constraintTop_toBottomOf="@id/app_bar"
             app:setRowData="@{vm.fileListLiveData}" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_file"
+            android:layout_width="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_button"
+            android:focusable="false"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:onClick="@{vm.addFile}"
+            android:visibility="@{vm.isBinning}"
+            app:layout_constraintTop_toBottomOf="@id/app_bar"
+            android:fontFamily="@font/open_sans_bold"
+            android:text="@string/add_new_file"
+            android:textColor="@color/white"
+            tools:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/tv_pending_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/c_113656"
+            android:textSize="16sp"
+            android:layout_margin="16dp"
+            android:visibility="@{vm.isBinning}"
+            app:layout_constraintTop_toBottomOf="@id/btn_add_file"
+            android:fontFamily="@font/font_medium"
+            android:text="@string/pending_files"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv_binning_files"
             android:layout_width="match_parent"
@@ -125,7 +156,7 @@
             android:visibility="@{vm.isBinning}"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/app_bar"
+            app:layout_constraintTop_toBottomOf="@id/tv_pending_file"
             app:setRowData="@{vm.binningFileListLiveData}" />
 
         <LinearLayout

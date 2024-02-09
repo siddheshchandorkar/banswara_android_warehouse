@@ -1,10 +1,5 @@
 package com.banswara.warehouse.network
 
-import com.banswara.warehouse.model.FetchFilesRequestModel
-import com.banswara.warehouse.model.ReadFileDataRequestModel
-import com.banswara.warehouse.model.DeviceChangeRequestModel
-import com.banswara.warehouse.model.LoginRequestModel
-import com.banswara.warehouse.model.SignUpRequestModel
 import com.banswara.warehouse.model.*
 import retrofit2.Call
 import retrofit2.http.Body
@@ -28,8 +23,11 @@ interface RetrofitService {
 	fun readFileData(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<List<FileContentModel>>
 	
 	@POST("/Api/AppApi/Fn_Copy_File_Process")
-	fun processFile(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<ProcessFileResponseModel>
- 
+	fun dispatchFile(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<ProcessFileResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Insert_Challan")
+	fun uploadFile(@Body uploadRequestModel: UploadRequestModel): Call<BaseResponseModel>
+	
 	@POST("/Api/AppApi/Fn_Change_User_Device")
 	fun changeUserDevice(@Body deviceChangeRequestModel: DeviceChangeRequestModel): Call<BaseResponseModel>
 	

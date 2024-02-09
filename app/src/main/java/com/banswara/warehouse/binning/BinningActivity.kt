@@ -10,11 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
+import com.banswara.warehouse.dashboard.RowBinningFilesViewModel
 import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityBinningBinding
+import com.banswara.warehouse.dispatch.RowChallanViewModel
 import com.banswara.warehouse.model.BaseRowModel
+import com.banswara.warehouse.model.BinningChallanModel
 import com.banswara.warehouse.model.BinningModel
-import com.google.zxing.client.android.BeepManager
+import com.banswara.warehouse.network.RetrofitRepository
+import com.banswara.warehouse.utils.StatusRetention
+import com.banswara.warehouse.utils.Utils
 import com.journeyapps.barcodescanner.CaptureManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,15 +45,49 @@ class BinningActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_binning)
+		viewModel = BinningViewModel(application)
 		
 		intent?.let {
 			if (it.hasExtra(KEY_FILE_NAME)) {
 				val fileName = it.getStringExtra(KEY_FILE_NAME) ?: ""
+				if (!TextUtils.isEmpty(fileName)) {
+					viewModel.fileName.value = fileName
+					val values = fileName.split("-")
+					if (values.size == 3) {
+						viewModel.first.value = values[0]
+						viewModel.second.value = values[1]
+						viewModel.third.value = values[2]
+					}
+					
+					//fetch db data for this file
+					CoroutineScope(Dispatchers.IO).launch {
+						val list = WareHouseDB.getDataBase(this@BinningActivity)?.wareHouseDao()
+							?.getBinningChallanByFile(fileName)
+						val tempList = arrayListOf<BaseRowModel>()
+						
+						list?.let {
+							it.forEach {
+								tempList.add(RowBinningViewModel(BinningModel(it, fileName)))
+							}
+						}
+						viewModel.challanListLiveData.postValue(tempList)
+					}
+				}
+				
 			}
 		}
-		viewModel = BinningViewModel(application)
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
+		
+		setSupportActionBar(binding.toolbar)
+		supportActionBar?.setDisplayHomeAsUpEnabled(true)
+		supportActionBar?.setDisplayShowHomeEnabled(true)
+		supportActionBar?.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.ic_back))
+		if (!TextUtils.isEmpty(viewModel.fileName.value)) {
+			supportActionBar?.title = viewModel.fileName.value
+		} else {
+			supportActionBar?.title = "Binning Process"
+		}
 		
 		
 		supportActionBar?.let {
@@ -72,6 +111,7 @@ class BinningActivity : AppCompatActivity() {
 		}
 		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
+			capture?.onPause()
 			if (viewModel.locationValidation()) {
 				
 				Toast.makeText(this, barcode.text, Toast.LENGTH_LONG).show()
@@ -108,28 +148,63 @@ class BinningActivity : AppCompatActivity() {
 				}
 			}
 			
+			capture?.onResume()
 			
 		}
 		
 		viewModel.events.observe(this) {
 			when (it) {
 				
-				BinningViewModel.EVENTS.FETCH_FILE_CONTENT -> {
-//					viewModel.user?.let { user ->
-//						CoroutineScope(Dispatchers.IO).launch {
-//							viewModel.isApiCalling.postValue(true)
-//							RetrofitRepository.instance.fetchFiles(
-//								user.userId,
-//								Utils.getDeviceId(contentResolver)
-//							)
-//						}
-//					}
+				BinningViewModel.EVENTS.UPLOAD_FILE -> {
+					viewModel.user?.let { user ->
+						CoroutineScope(Dispatchers.IO).launch {
+							
+							val challans = ArrayList<BinningChallanModel>()
+							viewModel.challanListLiveData.value?.forEach {
+								if (it is RowBinningViewModel) {
+									challans.add(BinningChallanModel(it.challanNo.get() ?: ""))
+								}
+							}
+							
+							viewModel.isApiCalling.postValue(true)
+							RetrofitRepository.instance.uploadBinningFile(
+								useId = user.userId.toString(),
+								deviceId = Utils.getDeviceId(contentResolver),
+								location = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!,
+								date = "",
+								challans
+							)
+						}
+					}
 				}
 				
 				is BinningViewModel.EVENTS.SHOW_TOAST -> {
 					Toast.makeText(this, it.msg, Toast.LENGTH_LONG).show()
 				}
 				
+				
+				else -> {}
+			}
+		}
+		
+		RetrofitRepository.instance.apiLiveData.observe(this) { it ->
+			when (it) {
+				
+				is RetrofitRepository.RequestType.UPLOAD_BINNING_FILE -> {
+					
+					if(it.uploadResponse.errorMsg.equals("Challan added successfully.", true)){
+						Toast.makeText(this, it.uploadResponse.errorMsg, Toast.LENGTH_SHORT).show()
+						//delete binning details for this file
+						CoroutineScope(Dispatchers.IO).launch {
+							WareHouseDB.getDataBase(this@BinningActivity)?.wareHouseDao()
+								?.deleteBinningChallanByFile(viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!)
+						}
+						finish()
+					}else{
+						Toast.makeText(this, it.uploadResponse.errorMsg, Toast.LENGTH_SHORT).show()
+					}
+					
+				}
 				
 				else -> {}
 			}

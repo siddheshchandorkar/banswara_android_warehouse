@@ -70,11 +70,11 @@
                     android:digits="0123456789"
                     android:gravity="center"
                     android:imeOptions="actionNext"
-                    android:importantForAutofill="no"
                     android:inputType="number"
                     android:letterSpacing="0.8"
                     android:maxLength="3"
                     android:maxLines="1"
+                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:text="@={vm.first}"
                     android:textSize="16sp"
                     tools:text="123" />
@@ -96,10 +96,13 @@
                     android:digits="0123456789"
                     android:imeOptions="actionNext"
                     android:inputType="number"
+                    android:gravity="center"
                     android:letterSpacing="0.8"
                     android:maxLength="3"
+                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:maxLines="1"
-                    android:text="@={vm.second}" />
+                    android:text="@={vm.second}"
+                    tools:text="321"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,9 +121,12 @@
                     android:imeOptions="actionDone"
                     android:inputType="number"
                     android:letterSpacing="0.8"
+                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
+                    android:gravity="center"
                     android:maxLength="3"
                     android:maxLines="1"
-                    android:text="@={vm.third}" />
+                    android:text="@={vm.third}"
+                    tools:text="123"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 

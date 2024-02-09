@@ -56,14 +56,12 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
 		
-		supportActionBar?.let {
-			if (supportActionBar == null) {
-				setSupportActionBar(binding.toolbar)
-				it.setDisplayHomeAsUpEnabled(true)
-				it.setDisplayShowHomeEnabled(true)
-				it.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.ic_back))
-			}
-		}
+		setSupportActionBar(binding.toolbar)
+		supportActionBar?.setDisplayHomeAsUpEnabled(true)
+		supportActionBar?.setDisplayShowHomeEnabled(true)
+		supportActionBar?.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.ic_back))
+		supportActionBar?.title = viewModel.fileName.value
+		
 		
 		capture = CaptureManager(this, binding.zxingBarcodeScanner)
 		capture?.initializeFromIntent(intent, savedInstanceState)
@@ -71,26 +69,6 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		capture?.decode()
 		changeLaserVisibility()
 
-//		viewModel.challanListLiveData.observe(this) {
-//			var allChallanScan = true
-//				it?.let { list ->
-//					list.forEach {
-//						if (it is RowChallanViewModel) {
-//							Log.d(
-//								"Siddhesh",
-//								"Checking status " + it.challanNo.get() + ": " + it.status.get()
-//							)
-//							if (it.status.get() != StatusRetention.SCANNED) {
-//								allChallanScan = false
-//							}
-//						}
-//					}
-//
-//				}
-//				viewModel.allScanned.value = allChallanScan
-//
-//		}
-		
 		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
 			var allChallanScan = true
@@ -160,7 +138,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 				DispatchViewModel.EVENTS.PROCESS_FILE -> {
 					CoroutineScope(Dispatchers.IO).launch {
 						viewModel.isApiCalling.postValue(true)
-						RetrofitRepository.instance.uploadScannedFile(
+						RetrofitRepository.instance.dispatchScannedFile(
 							viewModel.user!!.userId,
 							Utils.getDeviceId(contentResolver),
 							viewModel.fileName.value!!
@@ -195,7 +173,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					
 				}
 				
-				is RetrofitRepository.RequestType.PROCESS_FILE -> {
+				is RetrofitRepository.RequestType.DISPATCH_FILE -> {
 					viewModel.isApiCalling.value = false
 					viewModel.challanListLiveData.value = arrayListOf()
 					viewModel.events.value = DispatchViewModel.EVENTS.MOVE_TO_SUCCESS

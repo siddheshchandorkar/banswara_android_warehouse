@@ -58,6 +58,12 @@ interface WareHouseDao {
 	@Query("SELECT DISTINCT file_name FROM 'binning_details'  ")
 	fun getBinningFileList() : List<String>
 	
+	@Query("SELECT DISTINCT challan_number FROM 'binning_details'  WHERE file_name= :fileName")
+	fun getBinningChallanByFile(fileName : String) : List<String>
+	
+	@Query("DELETE FROM 'binning_details'  WHERE file_name= :fileName")
+	fun deleteBinningChallanByFile(fileName : String)
+	
 	
 	
 	

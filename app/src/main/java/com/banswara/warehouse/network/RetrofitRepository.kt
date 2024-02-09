@@ -162,9 +162,9 @@ class RetrofitRepository {
 			})
 	}
 	
-	suspend fun uploadScannedFile(useId: Int, deviceId: String, fileName: String) {
+	suspend fun dispatchScannedFile(useId: Int, deviceId: String, fileName: String) {
 		
-		retrofitService.processFile(ReadFileDataRequestModel(useId, deviceId, fileName))
+		retrofitService.dispatchFile(ReadFileDataRequestModel(useId, deviceId, fileName))
 			.enqueue(object : Callback<ProcessFileResponseModel> {
 				
 				override fun onResponse(
@@ -173,7 +173,7 @@ class RetrofitRepository {
 				) {
 					try {
 						response.body()?.let {
-							apiLiveData.value = RequestType.PROCESS_FILE(it)
+							apiLiveData.value = RequestType.DISPATCH_FILE(it)
 						}
 					} catch (t: Throwable) {
 						//set null list in case of crash
@@ -189,6 +189,34 @@ class RetrofitRepository {
 				}
 			})
 	}
+	suspend fun uploadBinningFile(useId: String, deviceId: String, location: String, date: String, challanList : List<BinningChallanModel> ) {
+		
+		retrofitService.uploadFile(UploadRequestModel(userId = useId, deviceId = deviceId, location = location,
+			activeDevice = true, transactionDate = date, challanList = challanList))
+			.enqueue(object : Callback<BaseResponseModel> {
+				
+				override fun onResponse(
+					call: Call<BaseResponseModel>,
+					response: Response<BaseResponseModel>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.UPLOAD_BINNING_FILE(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<BaseResponseModel>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
 	
 	sealed class RequestType {
 		data class LOGIN(val loginResponse: LoginResponseModel) : RequestType()
@@ -197,7 +225,8 @@ class RetrofitRepository {
 		data class FETCH_FILES(val fetchFilesResponseModel: List<ChallanFileModel>) : RequestType()
 		data class FETCH_FILE_CONTENT(val fetchContentResponseModel: List<FileContentModel>) :
 			RequestType()
-		data class PROCESS_FILE(val processFileResponseModel: ProcessFileResponseModel) : RequestType()
+		data class DISPATCH_FILE(val processFileResponseModel: ProcessFileResponseModel) : RequestType()
+		data class UPLOAD_BINNING_FILE(val uploadResponse: BaseResponseModel) : RequestType()
 		
 	}
 	

@@ -22,26 +22,31 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 	val user: LoginResponseModel? = PreferenceManager.getUser()
 	
 	init {
-		title.value= PreferenceManager.getUser()?.userName?:""
 		fileListLiveData.value = (arrayListOf<BaseRowModel>())
 		binningFileListLiveData.value = (arrayListOf<BaseRowModel>())
 	}
 	
-	fun binningClick(view : View){
-		if(binningFileListLiveData.value!!.isNotEmpty()){
+	fun binningClick(view: View) {
+		if (binningFileListLiveData.value!!.isNotEmpty()) {
 			title.value = "Binning Process"
 			isBinning.value = true
-		}else
+		} else
+			events.value = DASHBOARD_EVENTS.MOVE_TO_BINNING("")
+	}
+	
+	fun addFile(view: View) {
 		events.value = DASHBOARD_EVENTS.MOVE_TO_BINNING("")
 	}
-	fun dispatchClick(view : View){
+	
+	fun dispatchClick(view: View) {
 		title.value = "Dispatch Process"
 		isDispatch.value = true
 	}
 	
 	sealed class DASHBOARD_EVENTS {
 		data object FETCH_FILES : DASHBOARD_EVENTS()
+		data object FETCH_BINNING_FILES : DASHBOARD_EVENTS()
 		data object MOVE_TO_CHALLAN_LIST : DASHBOARD_EVENTS()
-		data class MOVE_TO_BINNING(val fileName : String) : DASHBOARD_EVENTS()
+		data class MOVE_TO_BINNING(val fileName: String) : DASHBOARD_EVENTS()
 	}
 }
