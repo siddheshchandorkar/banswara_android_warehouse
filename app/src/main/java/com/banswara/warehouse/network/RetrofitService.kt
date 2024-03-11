@@ -13,7 +13,7 @@ interface RetrofitService {
 	@POST("/Api/AppApi/Fn_Insert_User")
 	fun signUp(@Body signUpRequestModel: SignUpRequestModel): Call<BaseResponseModel>
 	
-	@POST("/Api/AppApi/Fn_Fetch_User")
+	@POST("/Api/AppApi/Fn_Login")
 	fun login(@Body loginRequestModel: LoginRequestModel): Call<LoginResponseModel>
 	
 	@POST("/Api/AppApi/Fn_Read_Directory_File")

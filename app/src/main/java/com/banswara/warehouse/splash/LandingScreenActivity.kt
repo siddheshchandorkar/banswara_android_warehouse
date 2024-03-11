@@ -10,7 +10,7 @@ import com.banswara.warehouse.dashboard.DashboardActivity
 import com.banswara.warehouse.login.LoginActivity
 import com.banswara.warehouse.utils.PreferenceManager
 
-class SplashScreenActivity : AppCompatActivity() {
+class LandingScreenActivity : AppCompatActivity() {
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

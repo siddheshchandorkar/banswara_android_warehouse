@@ -6,5 +6,7 @@ data class LoginRequestModel(
 	@SerializedName("nPinNo")
 	val pinNo: Long,
 	@SerializedName("vDeviceId")
-	val deviceId: String
+	val deviceId: String,
+	@SerializedName("bActiveDevice")
+	val status: Boolean = true
 )

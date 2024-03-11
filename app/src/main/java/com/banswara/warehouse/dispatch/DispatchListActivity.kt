@@ -174,9 +174,14 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 				}
 				
 				is RetrofitRepository.RequestType.DISPATCH_FILE -> {
-					viewModel.isApiCalling.value = false
-					viewModel.challanListLiveData.value = arrayListOf()
-					viewModel.events.value = DispatchViewModel.EVENTS.MOVE_TO_SUCCESS
+					if(it.processFileResponseModel.errorMsg.equals("File process successfully.")){
+						viewModel.isApiCalling.value = false
+						viewModel.challanListLiveData.value = arrayListOf()
+						viewModel.events.value = DispatchViewModel.EVENTS.MOVE_TO_SUCCESS
+					}else{
+						Toast.makeText(this, it.processFileResponseModel.errorMsg, Toast.LENGTH_SHORT).show()
+					}
+					
 					
 				}
 				

@@ -171,7 +171,7 @@ class BinningActivity : AppCompatActivity() {
 								useId = user.userId.toString(),
 								deviceId = Utils.getDeviceId(contentResolver),
 								location = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!,
-								date = "",
+								date = Utils.currentDataInFormat("dd/MM/yyyy")?:"",
 								challans
 							)
 						}

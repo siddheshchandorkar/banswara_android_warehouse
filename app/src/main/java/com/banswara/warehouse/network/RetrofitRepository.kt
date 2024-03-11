@@ -53,7 +53,13 @@ class RetrofitRepository {
 	
 	suspend fun callSignUpApi(pin: Long, deviceId: String, mobile: String, userName: String) {
 		
-		retrofitService.signUp(SignUpRequestModel(true, pin, deviceId, mobile, userName))
+		retrofitService.signUp(SignUpRequestModel(
+			activeStatus = true,
+			pinNo = pin,
+			deviceId = deviceId,
+			mobileNumber = mobile,
+			userName = userName
+		))
 			.enqueue(object : Callback<BaseResponseModel> {
 				
 				override fun onResponse(

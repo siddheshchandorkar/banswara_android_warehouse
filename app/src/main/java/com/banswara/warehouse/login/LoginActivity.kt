@@ -151,7 +151,7 @@ class LoginActivity : AppCompatActivity() {
 					) {
 						viewModel.pin.value = ""
 						viewModel.isLogin.value = false
-						viewModel.isDeviceNotRegistered.value  = true
+//						viewModel.isDeviceNotRegistered.value  = true //TODO Siddhesh revert this
 						Toast.makeText(
 							this,
 							"This device not registered. Please Sign Up with this device",
@@ -167,9 +167,17 @@ class LoginActivity : AppCompatActivity() {
 				}
 				
 				is RetrofitRepository.RequestType.SIGN_UP -> {
-					viewModel.isLogin.value = true
-					viewModel.userName.value = ""
-					viewModel.pin.value = ""
+					if(it.baseResponseModel.errorMsg.equals("User added successfully.")){
+						Toast.makeText(this, "Sign-Up Successful, Please login now", Toast.LENGTH_LONG)
+							.show()
+						viewModel.isLogin.value = true
+						viewModel.userName.value = ""
+						viewModel.pin.value = ""
+					}else{
+						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
+							.show()
+					}
+					
 				}
 				
 				else -> {
