@@ -68,7 +68,8 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		capture?.setShowMissingCameraPermissionDialog(false)
 		capture?.decode()
 		changeLaserVisibility()
-
+		RetrofitRepository.instance.apiLiveData.value = RetrofitRepository.RequestType.DEFAULT
+		
 		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
 			var allChallanScan = true
@@ -125,24 +126,29 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		viewModel.events.observe(this) {
 			when (it) {
 				DispatchViewModel.EVENTS.FETCH_FILE_CONTENT -> {
-					CoroutineScope(Dispatchers.IO).launch {
-						viewModel.isApiCalling.postValue(true)
-						RetrofitRepository.instance.fetchContent(
-							viewModel.user!!.userId,
-							Utils.getDeviceId(contentResolver),
-							viewModel.fileName.value!!
-						)
+					if (Utils.isInternetConnected(application)) {
+						CoroutineScope(Dispatchers.IO).launch {
+							viewModel.isApiCalling.postValue(true)
+							RetrofitRepository.instance.fetchContent(
+								viewModel.user!!.userId,
+								Utils.getDeviceId(contentResolver),
+								viewModel.fileName.value!!
+							)
+						}
 					}
 				}
 				
 				DispatchViewModel.EVENTS.PROCESS_FILE -> {
-					CoroutineScope(Dispatchers.IO).launch {
-						viewModel.isApiCalling.postValue(true)
-						RetrofitRepository.instance.dispatchScannedFile(
-							viewModel.user!!.userId,
-							Utils.getDeviceId(contentResolver),
-							viewModel.fileName.value!!
-						)
+					if (Utils.isInternetConnected(application)) {
+						
+						CoroutineScope(Dispatchers.IO).launch {
+							viewModel.isApiCalling.postValue(true)
+							RetrofitRepository.instance.dispatchScannedFile(
+								viewModel.user!!.userId,
+								Utils.getDeviceId(contentResolver),
+								viewModel.fileName.value!!
+							)
+						}
 					}
 				}
 				
@@ -155,6 +161,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		}
 		
 		RetrofitRepository.instance.apiLiveData.observe(this) { it ->
+			viewModel.isApiCalling.postValue(false)
 			when (it) {
 				
 				is RetrofitRepository.RequestType.FETCH_FILE_CONTENT -> {
@@ -174,12 +181,16 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 				}
 				
 				is RetrofitRepository.RequestType.DISPATCH_FILE -> {
-					if(it.processFileResponseModel.errorMsg.equals("File process successfully.")){
+					if (it.processFileResponseModel.errorMsg.equals("File process successfully.")) {
 						viewModel.isApiCalling.value = false
 						viewModel.challanListLiveData.value = arrayListOf()
 						viewModel.events.value = DispatchViewModel.EVENTS.MOVE_TO_SUCCESS
-					}else{
-						Toast.makeText(this, it.processFileResponseModel.errorMsg, Toast.LENGTH_SHORT).show()
+					} else {
+						Toast.makeText(
+							this,
+							it.processFileResponseModel.errorMsg,
+							Toast.LENGTH_SHORT
+						).show()
 					}
 					
 					
@@ -193,7 +204,6 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			android.R.id.home -> {
-				//TODO Siddhesh save details in db
 				finish()
 				
 			}

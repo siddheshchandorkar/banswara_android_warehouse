@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -27,6 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:titleTextColor="@color/c_113656"
+                android:backgroundTint="@color/white"
+                android:background="@color/white"
                 app:title="@{vm.fileName}" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -57,14 +60,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:backgroundTint="@color/c_C49D4F"
             android:background="@drawable/bg_button"
             android:enabled="@{vm.allScanned}"
+            android:visibility="@{!vm.isApiCalling}"
             android:focusable="false"
             android:onClick="@{vm.onShipped}"
             android:fontFamily="@font/open_sans_bold"
             android:text="Dispatch"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="gone"/>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"
+            android:progressTint="@color/c_C49D4F"
+            android:visibility="@{vm.isApiCalling}"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

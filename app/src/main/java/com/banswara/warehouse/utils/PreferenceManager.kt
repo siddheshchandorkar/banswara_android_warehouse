@@ -19,9 +19,13 @@ object PreferenceManager {
 		}
 	}
 	
-	fun saveUser(user: LoginResponseModel){
-		val userString = Gson().toJson(user, LoginResponseModel::class.java)
-		sSharedPreference?.edit()?.putString(KEY_USER_DETAILS,userString)?.apply()
+	fun saveUser(user: LoginResponseModel?){
+		user?.let {
+			val userString = Gson().toJson(user, LoginResponseModel::class.java)
+			sSharedPreference?.edit()?.putString(KEY_USER_DETAILS,userString)?.apply()
+		}?:run {
+			sSharedPreference?.edit()?.putString(KEY_USER_DETAILS,"")?.apply()
+		}
 	}
 	
 	fun getUser(): LoginResponseModel? {

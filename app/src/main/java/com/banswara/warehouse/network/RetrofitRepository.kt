@@ -225,6 +225,7 @@ class RetrofitRepository {
 	}
 	
 	sealed class RequestType {
+		data object DEFAULT : RequestType()
 		data class LOGIN(val loginResponse: LoginResponseModel) : RequestType()
 		data class SIGN_UP(val baseResponseModel: BaseResponseModel) : RequestType()
 		data class DEVICE_CHANGE(val baseResponseModel: BaseResponseModel) : RequestType()

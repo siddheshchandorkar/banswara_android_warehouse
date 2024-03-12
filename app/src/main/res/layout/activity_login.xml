@@ -27,6 +27,7 @@
             android:fontFamily="@font/font_regular"
             android:text="@{vm.isLogin? @string/welcome_to: @string/sign_up}"
             android:textSize="22sp"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/welcome_to" />
@@ -55,6 +56,8 @@
             android:layout_marginTop="48dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/user_name"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
             android:visibility="@{!vm.isLogin}"
             app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
@@ -64,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLength="25"
+                android:textColor="@color/black"
                 android:imeOptions="actionNext"
                 android:maxLines="1"
                 android:text="@={vm.userName}" />
@@ -79,6 +83,8 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/mobile_number"
+            android:backgroundTint="@color/white"
+            android:background="@color/white"
             android:visibility="@{!vm.isLogin}"
             app:layout_constraintTop_toBottomOf="@id/til_user_name">
 
@@ -90,6 +96,7 @@
                 android:inputType="number"
                 android:maxLength="10"
                 android:maxLines="1"
+                android:textColor="@color/black"
                 android:imeOptions="actionNext"
                 android:text="@={vm.mobileNumber}" />
 
@@ -103,6 +110,8 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
             android:hint="@string/pin"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
             app:layout_constraintTop_toBottomOf="@id/til_mobile_number"
             app:passwordToggleEnabled="true">
 
@@ -113,6 +122,7 @@
                 android:inputType="numberPassword"
                 android:imeOptions="actionDone"
                 android:maxLength="4"
+                android:textColor="@color/black"
                 android:maxLines="1"
                 android:text="@={vm.pin}" />
 
@@ -145,6 +155,7 @@
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.logIn}"
             android:focusable="false"
+            android:backgroundTint="@color/c_C49D4F"
             android:enabled="@{vm.loginEnable}"
             android:text="@string/login"
             android:textColor="@color/white"
@@ -169,6 +180,7 @@
                 android:fontFamily="@font/open_sans_regular"
                 android:text="@string/don_t_have_an_account"
                 android:textSize="16sp"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tv_sign_up"
                 app:layout_constraintStart_toStartOf="parent"
@@ -182,6 +194,7 @@
                 android:fontFamily="@font/open_sans_bold"
                 android:text="@string/sign_up"
                 android:textSize="16sp"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_chainStyle="packed"

@@ -26,6 +26,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:backgroundTint="@color/white"
                 app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -114,7 +116,10 @@
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/app_bar"
-            app:setRowData="@{vm.fileListLiveData}" />
+            app:setRowData="@{vm.fileListLiveData}"
+            tools:itemCount="20"
+            tools:listitem="@layout/row_files"
+            tools:visibility="invisible"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_add_file"
@@ -157,7 +162,10 @@
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_pending_file"
-            app:setRowData="@{vm.binningFileListLiveData}" />
+            app:setRowData="@{vm.binningFileListLiveData}"
+            tools:itemCount="10"
+            tools:listitem="@layout/row_binning_files"
+            tools:visibility="visible"/>
 
         <LinearLayout
             android:layout_width="match_parent"

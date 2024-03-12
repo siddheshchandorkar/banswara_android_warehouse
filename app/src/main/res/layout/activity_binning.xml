@@ -29,6 +29,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="Binning Process"
+                android:backgroundTint="@color/white"
+                android:background="@color/white"
                 app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -61,6 +63,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:background="@color/white"
+                android:backgroundTint="@color/white"
                 app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
                 <EditText
@@ -69,6 +73,7 @@
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:letterSpacing="0.8"
@@ -88,6 +93,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:background="@color/white"
+                android:backgroundTint="@color/white"
                 app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -98,6 +105,7 @@
                     android:inputType="number"
                     android:gravity="center"
                     android:letterSpacing="0.8"
+                    android:textColor="@color/black"
                     android:maxLength="3"
                     android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:maxLines="1"
@@ -112,6 +120,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:background="@color/white"
+                android:backgroundTint="@color/white"
                 app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -121,6 +131,7 @@
                     android:imeOptions="actionDone"
                     android:inputType="number"
                     android:letterSpacing="0.8"
+                    android:textColor="@color/black"
                     android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:gravity="center"
                     android:maxLength="3"
@@ -142,6 +153,18 @@
             app:layout_constraintTop_toBottomOf="@id/ll_file_name"
             app:zxing_scanner_layout="@layout/custom_barcode_scanner" />
 
+        <TextView
+            android:id="@+id/tv_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/font_medium"
+            android:textSize="14sp"
+            android:text="@string/list_of_products_scanned"
+            app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -153,8 +176,10 @@
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layout_constraintBottom_toTopOf="@id/btn_shipped"
-            app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner"
-            app:setRowData="@{vm.challanListLiveData}" />
+            app:layout_constraintTop_toBottomOf="@id/tv_label"
+            app:setRowData="@{vm.challanListLiveData}"
+            tools:itemCount="10"
+            tools:listitem="@layout/row_binning"/>
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -164,13 +189,25 @@
             android:layout_margin="16dp"
             android:background="@drawable/bg_button"
             android:focusable="false"
+            android:backgroundTint="@color/c_C49D4F"
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.onShipped}"
             android:text="@string/submit"
+            android:visibility="@{!vm.isApiCalling}"
             android:enabled="@{vm.submitEnable}"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:enabled="false"/>
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"
+            android:progressTint="@color/c_C49D4F"
+            android:visibility="@{vm.isApiCalling}"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

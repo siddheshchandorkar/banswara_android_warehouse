@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ import com.banswara.warehouse.binning.BinningActivity
 import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityDashboardBinding
 import com.banswara.warehouse.dispatch.DispatchListActivity
+import com.banswara.warehouse.login.LoginActivity
 import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.model.ChallanFileModel
 import com.banswara.warehouse.network.RetrofitRepository
@@ -47,9 +49,10 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		} else {
 			supportActionBar?.title = getString(R.string.banswara_warehouse)
 		}
+		RetrofitRepository.instance.apiLiveData.value = RetrofitRepository.RequestType.DEFAULT
 		
-		viewModel.title.observe(this){
-			if(!TextUtils.isEmpty(it)){
+		viewModel.title.observe(this) {
+			if (!TextUtils.isEmpty(it)) {
 				supportActionBar?.title = it
 			} else if (!TextUtils.isEmpty(PreferenceManager.getUser()?.userName)) {
 				supportActionBar?.title = "Hello, " + PreferenceManager.getUser()?.userName
@@ -61,13 +64,16 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 			when (it) {
 				
 				DashboardViewModel.DASHBOARD_EVENTS.FETCH_FILES -> {
-					viewModel.user?.let { user ->
-						CoroutineScope(Dispatchers.IO).launch {
-							viewModel.isApiCalling.postValue(true)
-							RetrofitRepository.instance.fetchFiles(
-								user.userId,
-								Utils.getDeviceId(contentResolver)
-							)
+					if (Utils.isInternetConnected(application)) {
+						
+						viewModel.user?.let { user ->
+							CoroutineScope(Dispatchers.IO).launch {
+								viewModel.isApiCalling.postValue(true)
+								RetrofitRepository.instance.fetchFiles(
+									user.userId,
+									Utils.getDeviceId(contentResolver)
+								)
+							}
 						}
 					}
 				}
@@ -112,7 +118,8 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					it.fetchFilesResponseModel.forEach { file ->
 						list.add(RowFilesViewModel(file, this))
 						CoroutineScope(Dispatchers.IO).launch {
-							Log.d("Siddhesh",
+							Log.d(
+								"Siddhesh",
 								"File Inserted : " + WareHouseDB.getDataBase(this@DashboardActivity)
 									?.wareHouseDao()?.insertFile(file)
 							)
@@ -140,6 +147,12 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		})
 	}
 	
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		menuInflater.inflate(R.menu.logout, menu)
+		return true
+	}
+	
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
@@ -155,6 +168,15 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				} else
 					finish()
 			}
+			
+			R.id.logout -> {
+				PreferenceManager.saveUser(null)
+				val intent = Intent(this, LoginActivity::class.java)
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+				startActivity(intent)
+				finish()
+			}
+			
 		}
 		return super.onOptionsItemSelected(item)
 	}

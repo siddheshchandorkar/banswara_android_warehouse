@@ -32,15 +32,6 @@ class BinningActivity : AppCompatActivity() {
 	private lateinit var viewModel: BinningViewModel
 	private lateinit var binding: ActivityBinningBinding
 	private var capture: CaptureManager? = null
-
-
-//	private var successLauncher = registerForActivityResult<Intent, ActivityResult>(
-//		ActivityResultContracts.StartActivityForResult()
-//	) { result: ActivityResult? ->
-//		startActivity(Intent(this, DashboardActivity::class.java))
-//		finish()
-//
-//	}
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -89,6 +80,7 @@ class BinningActivity : AppCompatActivity() {
 			supportActionBar?.title = "Binning Process"
 		}
 		
+		RetrofitRepository.instance.apiLiveData.value = RetrofitRepository.RequestType.DEFAULT
 		
 		supportActionBar?.let {
 			if (supportActionBar == null) {
@@ -156,24 +148,26 @@ class BinningActivity : AppCompatActivity() {
 			when (it) {
 				
 				BinningViewModel.EVENTS.UPLOAD_FILE -> {
-					viewModel.user?.let { user ->
-						CoroutineScope(Dispatchers.IO).launch {
-							
-							val challans = ArrayList<BinningChallanModel>()
-							viewModel.challanListLiveData.value?.forEach {
-								if (it is RowBinningViewModel) {
-									challans.add(BinningChallanModel(it.challanNo.get() ?: ""))
+					if(Utils.isInternetConnected(application)) {
+						viewModel.user?.let { user ->
+							CoroutineScope(Dispatchers.IO).launch {
+								
+								val challans = ArrayList<BinningChallanModel>()
+								viewModel.challanListLiveData.value?.forEach {
+									if (it is RowBinningViewModel) {
+										challans.add(BinningChallanModel(it.challanNo.get() ?: ""))
+									}
 								}
+								
+								viewModel.isApiCalling.postValue(true)
+								RetrofitRepository.instance.uploadBinningFile(
+									useId = user.userId.toString(),
+									deviceId = Utils.getDeviceId(contentResolver),
+									location = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!,
+									date = Utils.currentDataInFormat("dd/MM/yyyy")?:"",
+									challans
+								)
 							}
-							
-							viewModel.isApiCalling.postValue(true)
-							RetrofitRepository.instance.uploadBinningFile(
-								useId = user.userId.toString(),
-								deviceId = Utils.getDeviceId(contentResolver),
-								location = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!,
-								date = Utils.currentDataInFormat("dd/MM/yyyy")?:"",
-								challans
-							)
 						}
 					}
 				}
@@ -188,6 +182,8 @@ class BinningActivity : AppCompatActivity() {
 		}
 		
 		RetrofitRepository.instance.apiLiveData.observe(this) { it ->
+			viewModel.isApiCalling.postValue(false)
+			
 			when (it) {
 				
 				is RetrofitRepository.RequestType.UPLOAD_BINNING_FILE -> {
@@ -258,7 +254,6 @@ class BinningActivity : AppCompatActivity() {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			android.R.id.home -> {
-				//TODO Siddhesh save details in db
 				finish()
 				
 			}

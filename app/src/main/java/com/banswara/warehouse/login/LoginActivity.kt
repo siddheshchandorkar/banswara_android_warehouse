@@ -33,12 +33,11 @@ class LoginActivity : AppCompatActivity() {
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 		viewModel = LoginViewModel(application)
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
-		
+		RetrofitRepository.instance.apiLiveData.value = RetrofitRepository.RequestType.DEFAULT
 		setObservers()
 		
 	}
@@ -78,12 +77,14 @@ class LoginActivity : AppCompatActivity() {
 		viewModel.events.observe(this) {
 			when (it) {
 				LoginViewModel.LoginEvents.LOGIN -> {
-					
-					CoroutineScope(Dispatchers.IO).launch {
+					if(Utils.isInternetConnected(application)){
+						
+						CoroutineScope(Dispatchers.IO).launch {
 						RetrofitRepository.instance.callLoginApi(
 							viewModel.pin.value!!.toLong(),
 							Utils.getDeviceId(contentResolver)
 						)
+					}
 					}
 				}
 				
@@ -94,23 +95,25 @@ class LoginActivity : AppCompatActivity() {
 				).show()
 				
 				LoginViewModel.LoginEvents.SIGN_IN -> {
-					CoroutineScope(Dispatchers.IO).launch {
-						if(viewModel.isDeviceNotRegistered.value == false){
-							RetrofitRepository.instance.callSignUpApi(
-								viewModel.pin.value!!.toLong(),
-								Utils.getDeviceId(contentResolver),
-								viewModel.mobileNumber.value!!,
-								viewModel.userName.value!!
-							)
-						}else{
-							RetrofitRepository.instance.callDeviceChange(
-								viewModel.pin.value!!.toLong(),
-								Utils.getDeviceId(contentResolver),
-								viewModel.mobileNumber.value!!,
-								viewModel.userName.value!!
-							)
+					if(Utils.isInternetConnected(application)){
+						CoroutineScope(Dispatchers.IO).launch {
+							if(viewModel.isDeviceNotRegistered.value == false){
+								RetrofitRepository.instance.callSignUpApi(
+									viewModel.pin.value!!.toLong(),
+									Utils.getDeviceId(contentResolver),
+									viewModel.mobileNumber.value!!,
+									viewModel.userName.value!!
+								)
+							}else{
+								RetrofitRepository.instance.callDeviceChange(
+									viewModel.pin.value!!.toLong(),
+									Utils.getDeviceId(contentResolver),
+									viewModel.mobileNumber.value!!,
+									viewModel.userName.value!!
+								)
+							}
+							
 						}
-						
 					}
 				}
 				
@@ -151,7 +154,7 @@ class LoginActivity : AppCompatActivity() {
 					) {
 						viewModel.pin.value = ""
 						viewModel.isLogin.value = false
-//						viewModel.isDeviceNotRegistered.value  = true //TODO Siddhesh revert this
+						viewModel.isDeviceNotRegistered.value  = true
 						Toast.makeText(
 							this,
 							"This device not registered. Please Sign Up with this device",
