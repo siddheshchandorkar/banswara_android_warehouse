@@ -17,7 +17,11 @@ class SuccessActivity : AppCompatActivity() {
 		
 		intent?.let {
 			val from = it.getBooleanExtra(KEY_FROM_LOGIN, false)
-			viewModel = SuccessViewModel(from,application)
+			var file =""
+				if(it.hasExtra(KEY_FILE_NAME)){
+					file = it.getStringExtra(KEY_FILE_NAME)?:""
+				}
+			viewModel = SuccessViewModel(isLoginSuccess = from, app = application, file = file)
 		}
 		binding.vm = viewModel
 		binding.lifecycleOwner = this
@@ -30,6 +34,7 @@ class SuccessActivity : AppCompatActivity() {
 	
 	companion object{
 		const val KEY_FROM_LOGIN ="from"
+		const val KEY_FILE_NAME ="file_name"
 	}
 	
 	

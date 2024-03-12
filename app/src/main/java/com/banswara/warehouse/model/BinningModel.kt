@@ -17,6 +17,9 @@ data class BinningModel(
 	@ColumnInfo(name = "file_name", defaultValue = "")
 	@SerializedName("vFileName")
 	var fileName: String = "", //Use to fetch files
+	@ColumnInfo(name = "created_date", defaultValue = "")
+	@SerializedName("created_date")
+	var createdDate: String = "", //Use to fetch files
 ){
 	override fun toString(): String {
 		return fileContent

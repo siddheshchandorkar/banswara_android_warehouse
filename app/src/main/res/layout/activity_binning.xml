@@ -28,9 +28,9 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="Binning Process"
-                android:backgroundTint="@color/white"
                 android:background="@color/white"
+                android:backgroundTint="@color/white"
+                app:title="Binning Process"
                 app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -38,13 +38,13 @@
             android:id="@+id/tv_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
             android:fontFamily="@font/font_medium"
             android:text="Location"
             android:textAllCaps="true"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/app_bar"/>
+            app:layout_constraintTop_toBottomOf="@id/app_bar" />
 
         <LinearLayout
             android:id="@+id/ll_file_name"
@@ -72,15 +72,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
+                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:gravity="center"
-                    android:textColor="@color/black"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:letterSpacing="0.8"
                     android:maxLength="3"
+                    android:fontFamily="@font/font_medium"
                     android:maxLines="1"
-                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:text="@={vm.first}"
+                    android:textColor="@color/black"
                     android:textSize="16sp"
                     tools:text="123" />
 
@@ -101,16 +102,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
+                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
+                    android:gravity="center"
                     android:imeOptions="actionNext"
                     android:inputType="number"
-                    android:gravity="center"
+                    android:fontFamily="@font/font_medium"
                     android:letterSpacing="0.8"
-                    android:textColor="@color/black"
                     android:maxLength="3"
-                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
                     android:maxLines="1"
                     android:text="@={vm.second}"
-                    tools:text="321"/>
+                    android:textColor="@color/black"
+                    tools:text="321" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -125,19 +127,21 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_three"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
+                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
+                    android:gravity="center"
                     android:imeOptions="actionDone"
                     android:inputType="number"
                     android:letterSpacing="0.8"
-                    android:textColor="@color/black"
-                    android:enabled="@{TextUtils.isEmpty(vm.fileName)}"
-                    android:gravity="center"
+                    android:fontFamily="@font/font_medium"
                     android:maxLength="3"
                     android:maxLines="1"
                     android:text="@={vm.third}"
-                    tools:text="123"/>
+                    android:textColor="@color/black"
+                    tools:text="123" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -157,14 +161,14 @@
             android:id="@+id/tv_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/font_medium"
+            android:text="@string/list_of_products_scanned"
+            android:textColor="@color/black"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"
-            android:textColor="@color/black"
-            android:fontFamily="@font/font_medium"
-            android:textSize="14sp"
-            android:text="@string/list_of_products_scanned"
-            app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner"/>
+            app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner" />
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -179,35 +183,67 @@
             app:layout_constraintTop_toBottomOf="@id/tv_label"
             app:setRowData="@{vm.challanListLiveData}"
             tools:itemCount="10"
-            tools:listitem="@layout/row_binning"/>
+            tools:listitem="@layout/row_binning" />
 
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_shipped"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/bg_button"
-            android:focusable="false"
             android:backgroundTint="@color/c_C49D4F"
+            android:enabled="@{vm.submitEnable}"
+            android:focusable="false"
             android:fontFamily="@font/open_sans_bold"
             android:onClick="@{vm.onShipped}"
             android:text="@string/submit"
-            android:visibility="@{!vm.isApiCalling}"
-            android:enabled="@{vm.submitEnable}"
             android:textColor="@color/white"
+            android:visibility="@{!vm.isApiCalling}"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:enabled="false"/>
+            app:layout_constraintEnd_toStartOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:enabled="false" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_next"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_button"
+            android:backgroundTint="@color/c_C49D4F"
+            android:enabled="@{!vm.isApiCalling}"
+            android:focusable="false"
+            android:fontFamily="@font/open_sans_bold"
+            android:onClick="@{vm.scanNext}"
+            android:text="@string/scan_next"
+            android:textColor="@color/white"
+            android:visibility="@{!vm.isApiCalling}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline"
+            tools:enabled="false" />
 
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:layout_margin="16dp"
             android:progressTint="@color/c_C49D4F"
             android:visibility="@{vm.isApiCalling}"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

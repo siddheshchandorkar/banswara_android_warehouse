@@ -62,6 +62,9 @@ class LoginActivity : AppCompatActivity() {
 				viewModel.signInEnable.value = viewModel.checkSignInValidations(false)
 			}
 		}
+		viewModel.confirmPin.observe(this) {
+				viewModel.signInEnable.value = viewModel.checkSignInValidations(false)
+		}
 		
 		onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
 			override fun handleOnBackPressed() {
@@ -72,6 +75,14 @@ class LoginActivity : AppCompatActivity() {
 				}
 			}
 		})
+		
+		binding.ivBack.setOnClickListener {
+			viewModel.isLogin.value = true
+			
+		}
+		binding.ivClose.setOnClickListener {
+			finish()
+		}
 		
 		//Login Screen Events Observers
 		viewModel.events.observe(this) {
@@ -142,6 +153,7 @@ class LoginActivity : AppCompatActivity() {
 						
 						Toast.makeText(this, "Login Success", Toast.LENGTH_LONG)
 							.show()
+						it.loginResponse.isLogout = false
 						PreferenceManager.saveUser(it.loginResponse)
 						PreferenceManager.getUser()?.let {
 							startActivity(Intent(this, DashboardActivity::class.java))
@@ -175,7 +187,9 @@ class LoginActivity : AppCompatActivity() {
 							.show()
 						viewModel.isLogin.value = true
 						viewModel.userName.value = ""
+						viewModel.mobileNumber.value = ""
 						viewModel.pin.value = ""
+						viewModel.confirmPin.value = ""
 					}else{
 						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
 							.show()
@@ -183,9 +197,7 @@ class LoginActivity : AppCompatActivity() {
 					
 				}
 				
-				else -> {
-					Toast.makeText(this, "Please Try Again", Toast.LENGTH_LONG).show()
-				}
+				else -> {}
 			}
 		}
 		

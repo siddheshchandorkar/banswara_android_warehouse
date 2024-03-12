@@ -197,7 +197,7 @@ class RetrofitRepository {
 	}
 	suspend fun uploadBinningFile(useId: String, deviceId: String, location: String, date: String, challanList : List<BinningChallanModel> ) {
 		
-		retrofitService.uploadFile(UploadRequestModel(userId = useId, deviceId = deviceId, location = location,
+		retrofitService.uploadBinningFile(UploadRequestModel(userId = useId, deviceId = deviceId, location = location,
 			activeDevice = true, transactionDate = date, challanList = challanList))
 			.enqueue(object : Callback<BaseResponseModel> {
 				

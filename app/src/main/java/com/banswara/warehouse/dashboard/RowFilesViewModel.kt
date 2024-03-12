@@ -10,6 +10,7 @@ import com.banswara.warehouse.utils.StatusRetention
 class RowFilesViewModel(val challanFileModel: ChallanFileModel, val fileClick: FileClick) : BaseRowModel() {
 	
 	val fileName: ObservableField<String> = ObservableField(challanFileModel.fileName)
+	val date: ObservableField<String> = ObservableField(challanFileModel.fileName)
 	val status: ObservableField<StatusRetention.StatusValue> = ObservableField()
 	
 	override fun setLayoutID() {

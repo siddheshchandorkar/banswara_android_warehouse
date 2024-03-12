@@ -10,10 +10,10 @@ data class LoginResponseModel(
 	@PrimaryKey
 	@ColumnInfo(name = "user_id")
 	@SerializedName("UserId")
-	val userId: Int,
+	var userId: Int,
 	
 	@ColumnInfo(name = "active_status")
-	@SerializedName("bActiveStatus")
+	@SerializedName("bActiveDevice")
 	val activeStatus: Boolean,
 	
 	@ColumnInfo(name = "pin_no")
@@ -33,5 +33,7 @@ data class LoginResponseModel(
 	val userName: String,
 	
 	@SerializedName("vErrorMsg")
-	var errorMsg: String = ""
+	var errorMsg: String = "",
+	
+	var isLogout : Boolean? = false
 )

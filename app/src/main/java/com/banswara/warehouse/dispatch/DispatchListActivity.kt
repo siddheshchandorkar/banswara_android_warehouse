@@ -155,6 +155,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 				DispatchViewModel.EVENTS.MOVE_TO_SUCCESS -> {
 					val intent = Intent(this, SuccessActivity::class.java)
 					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, false)
+					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, viewModel.fileName.value!!)
 					successLauncher.launch(intent)
 				}
 			}
@@ -194,6 +195,9 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					}
 					
 					
+				}
+				is RetrofitRepository.RequestType.DEFAULT ->{
+				
 				}
 				
 				else -> {}

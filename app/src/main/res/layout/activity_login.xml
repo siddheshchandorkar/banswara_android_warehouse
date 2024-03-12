@@ -17,6 +17,27 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back"
+            android:visibility="@{!vm.isLogin}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:padding="10dp"
+            android:alpha="0.8"
+            android:src="@drawable/ic_close"
+            android:visibility="@{vm.isLogin}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tv_welcome"
             android:layout_width="wrap_content"
@@ -26,8 +47,8 @@
             android:layout_marginEnd="16dp"
             android:fontFamily="@font/font_regular"
             android:text="@{vm.isLogin? @string/welcome_to: @string/sign_up}"
-            android:textSize="22sp"
             android:textColor="@color/black"
+            android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/welcome_to" />
@@ -41,8 +62,8 @@
             android:layout_marginEnd="16dp"
             android:fontFamily="@font/font_bold"
             android:text="@{vm.isLogin? @string/warehouse_by_banswara: @string/create_new_account}"
-            android:textSize="24sp"
             android:textColor="@color/c_113656"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_welcome"
@@ -55,9 +76,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="48dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/user_name"
             android:background="@color/white"
             android:backgroundTint="@color/white"
+            android:hint="@string/user_name"
             android:visibility="@{!vm.isLogin}"
             app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
@@ -65,12 +86,12 @@
                 android:id="@+id/et_user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
                 android:inputType="text"
                 android:maxLength="25"
-                android:textColor="@color/black"
-                android:imeOptions="actionNext"
                 android:maxLines="1"
-                android:text="@={vm.userName}" />
+                android:text="@={vm.userName}"
+                android:textColor="@color/black" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,9 +103,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/mobile_number"
-            android:backgroundTint="@color/white"
             android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:hint="@string/mobile_number"
             android:visibility="@{!vm.isLogin}"
             app:layout_constraintTop_toBottomOf="@id/til_user_name">
 
@@ -93,12 +114,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="0123456789"
+                android:imeOptions="actionNext"
                 android:inputType="number"
                 android:maxLength="10"
                 android:maxLines="1"
-                android:textColor="@color/black"
-                android:imeOptions="actionNext"
-                android:text="@={vm.mobileNumber}" />
+                android:text="@={vm.mobileNumber}"
+                android:textColor="@color/black" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -109,9 +130,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/pin"
             android:background="@color/white"
             android:backgroundTint="@color/white"
+            android:hint="@string/pin"
             app:layout_constraintTop_toBottomOf="@id/til_mobile_number"
             app:passwordToggleEnabled="true">
 
@@ -119,12 +140,39 @@
                 android:id="@+id/et_pin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
                 android:inputType="numberPassword"
-                android:imeOptions="actionDone"
                 android:maxLength="4"
-                android:textColor="@color/black"
                 android:maxLines="1"
-                android:text="@={vm.pin}" />
+                android:text="@={vm.pin}"
+                android:textColor="@color/black" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_confirm_pin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:hint="@string/confirm_pin"
+            android:visibility="@{!vm.isLogin}"
+            app:layout_constraintTop_toBottomOf="@id/til_pin"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_confirm_pin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="numberPassword"
+                android:maxLength="4"
+                android:maxLines="1"
+                android:text="@={vm.confirmPin}"
+                android:textColor="@color/black" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -136,10 +184,10 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/bg_button"
-            android:fontFamily="@font/open_sans_bold"
-            android:onClick="@{vm.signIn}"
             android:enabled="@{vm.signInEnable}"
             android:focusable="false"
+            android:fontFamily="@font/open_sans_bold"
+            android:onClick="@{vm.signIn}"
             android:text="@string/sign_in"
             android:textColor="@color/white"
             android:visibility="@{!vm.isLogin}"
@@ -152,11 +200,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:background="@drawable/bg_button"
-            android:fontFamily="@font/open_sans_bold"
-            android:onClick="@{vm.logIn}"
-            android:focusable="false"
             android:backgroundTint="@color/c_C49D4F"
             android:enabled="@{vm.loginEnable}"
+            android:focusable="false"
+            android:fontFamily="@font/open_sans_bold"
+            android:onClick="@{vm.logIn}"
             android:text="@string/login"
             android:textColor="@color/white"
             android:visibility="@{vm.isLogin}"
@@ -179,8 +227,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/open_sans_regular"
                 android:text="@string/don_t_have_an_account"
-                android:textSize="16sp"
                 android:textColor="@color/black"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tv_sign_up"
                 app:layout_constraintStart_toStartOf="parent"
@@ -193,8 +241,8 @@
                 android:layout_marginStart="5dp"
                 android:fontFamily="@font/open_sans_bold"
                 android:text="@string/sign_up"
-                android:textSize="16sp"
                 android:textColor="@color/black"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_chainStyle="packed"

@@ -14,4 +14,5 @@ data class UploadRequestModel(
 	@SerializedName("vDeviceId")
 	val deviceId: String,
 	@SerializedName("oChallanList")
-	val challanList: List<BinningChallanModel>)
+	val challanList: List<BinningChallanModel>
+)

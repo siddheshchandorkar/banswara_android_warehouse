@@ -3,7 +3,7 @@ package com.banswara.warehouse.model
 import com.google.gson.annotations.SerializedName
 
 data class DeviceChangeRequestModel(
-	@SerializedName("bActiveStatus")
+	@SerializedName("bActiveDevice")
 	val activeStatus: Boolean,
 	@SerializedName("nPinNo")
 	val pinNo: Long,

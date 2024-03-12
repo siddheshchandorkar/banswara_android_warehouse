@@ -1,24 +1,33 @@
 package com.banswara.warehouse.login
 
 import android.app.Application
+import android.content.Intent
 import android.text.TextUtils
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.banswara.warehouse.R
+import com.banswara.warehouse.dashboard.DashboardActivity
+import com.banswara.warehouse.utils.PreferenceManager
 
 class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	
 	val userName = MutableLiveData<String>()
 	val userNameError = MutableLiveData<String>()
 	val mobileNumber = MutableLiveData<String>()
-	val isLogin = MutableLiveData<Boolean>(true)
+	val isLogin = MutableLiveData<Boolean>(false)
 	val isDeviceNotRegistered = MutableLiveData<Boolean>(false)
 	val loginEnable = MutableLiveData<Boolean>(false)
 	val signInEnable = MutableLiveData<Boolean>(false)
 	val pin = MutableLiveData<String>()
+	val confirmPin = MutableLiveData<String>()
 	val events = MutableLiveData<LoginEvents>()
 	
+	init {
+		PreferenceManager.getUser()?.let {
+			isLogin.value = !TextUtils.isEmpty(it.userName)
+		}
+	}
 	
 	fun signIn(view: View) {
 		if (checkSignInValidations(true)) {
@@ -28,6 +37,10 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 	
 	fun createAccount(view: View) {
 		isLogin.value = false
+		userName.value =""
+		mobileNumber.value =""
+		pin.value =""
+		confirmPin.value =""
 	}
 	
 	
@@ -71,6 +84,19 @@ class LoginViewModel(val app : Application) : AndroidViewModel(app) {
 		}else if (pin.value!!.length< 4) {
 			if(showError)
 			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_4_digit_valid_pin))
+			return false
+		}
+		else if (TextUtils.isEmpty(confirmPin.value)) {
+			if(showError)
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_confirm_pin))
+			return false
+		}else if (confirmPin.value!!.length< 4) {
+			if(showError)
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.error_enter_4_digit_valid_confirm_pin))
+			return false
+		}else if (!confirmPin.value.equals(pin.value)) {
+			if(showError)
+			events.value = LoginEvents.SHOW_TOAST(app.getString(R.string.pin_not_match))
 			return false
 		}
 		

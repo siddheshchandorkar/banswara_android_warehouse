@@ -1,5 +1,7 @@
 package com.banswara.warehouse.dashboard
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -128,6 +130,10 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					viewModel.fileListLiveData.value = (list)
 				}
 				
+				is RetrofitRepository.RequestType.DEFAULT ->{
+				
+				}
+				
 				else -> {}
 			}
 		}
@@ -147,11 +153,11 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		})
 	}
 	
-	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+	/*override fun onCreateOptionsMenu(menu: Menu): Boolean {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		menuInflater.inflate(R.menu.logout, menu)
 		return true
-	}
+	}*/
 	
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -165,20 +171,34 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					viewModel.isBinning.value = false
 					viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
 					
-				} else
-					finish()
+				} else {
+					confirmLogout()
+				}
 			}
 			
 			R.id.logout -> {
-				PreferenceManager.saveUser(null)
-				val intent = Intent(this, LoginActivity::class.java)
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-				startActivity(intent)
-				finish()
+				confirmLogout()
 			}
 			
 		}
 		return super.onOptionsItemSelected(item)
+	}
+	
+	fun confirmLogout(){
+		AlertDialog.Builder(this)
+			.setMessage("Are you sure you want to Logout?")
+			.setCancelable(false)
+			.setPositiveButton("Yes"
+			) { dialog, id ->
+					PreferenceManager.logout()
+					val intent = Intent(this, LoginActivity::class.java)
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+					startActivity(intent)
+					finish()
+				
+			}
+			.setNegativeButton("No", null)
+			.show()
 	}
 	
 	

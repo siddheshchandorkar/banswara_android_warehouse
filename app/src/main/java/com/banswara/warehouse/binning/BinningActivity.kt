@@ -1,24 +1,25 @@
 package com.banswara.warehouse.binning
 
+import android.R.id.edit
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.banswara.warehouse.R
-import com.banswara.warehouse.dashboard.RowBinningFilesViewModel
 import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityBinningBinding
-import com.banswara.warehouse.dispatch.RowChallanViewModel
 import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.model.BinningChallanModel
 import com.banswara.warehouse.model.BinningModel
 import com.banswara.warehouse.network.RetrofitRepository
-import com.banswara.warehouse.utils.StatusRetention
 import com.banswara.warehouse.utils.Utils
 import com.journeyapps.barcodescanner.CaptureManager
 import kotlinx.coroutines.CoroutineScope
@@ -96,20 +97,42 @@ class BinningActivity : AppCompatActivity() {
 		capture?.setShowMissingCameraPermissionDialog(false)
 		capture?.decode()
 		changeLaserVisibility()
-		val list = arrayListOf<BaseRowModel>()
+		
+		binding.etThree.setOnEditorActionListener { v, actionId, event ->
+			if (actionId == EditorInfo.IME_ACTION_SEARCH
+				|| actionId == EditorInfo.IME_ACTION_DONE
+				|| event.action == KeyEvent.ACTION_DOWN
+				&& event.keyCode == KeyEvent.KEYCODE_ENTER
+			) {
+				binding.etThree.clearFocus()
+				val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+				imm.hideSoftInputFromWindow(binding.etThree.getWindowToken(), 0)
+				
+				return@setOnEditorActionListener true
+			}
+			return@setOnEditorActionListener false
+		}
+		
+		
 		
 		viewModel.challanListLiveData.observe(this) {
 			viewModel.submitEnable.value = it.isNotEmpty()
 		}
 		
+		
 		binding.zxingBarcodeScanner.decodeContinuous { barcode ->
+			val scannedList = arrayListOf<BaseRowModel>()
+			viewModel.challanListLiveData.value?.let {
+				scannedList.addAll(it)
+			}
+			Log.d("siddhhesh", "list size : "+scannedList.size)
+			
 			capture?.onPause()
 			if (viewModel.locationValidation()) {
 				
-				Toast.makeText(this, barcode.text, Toast.LENGTH_LONG).show()
 //			beepManager?.playBeepSoundAndVibrate()
 				var contains = false
-				list.forEach {
+				scannedList.forEach {
 					if (it is RowBinningViewModel) {
 						if (it.binningModel.fileContent.equals(barcode.text)) {
 							contains = true
@@ -117,6 +140,7 @@ class BinningActivity : AppCompatActivity() {
 					}
 				}
 				if (!contains) {
+					Toast.makeText(this, barcode.text, Toast.LENGTH_LONG).show()
 					val binningModel: BinningModel
 					if (!TextUtils.isEmpty(viewModel.fileName.value)) {
 						binningModel = BinningModel(
@@ -129,18 +153,20 @@ class BinningActivity : AppCompatActivity() {
 							fileName = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!
 						)
 					}
-					list.add(RowBinningViewModel(binningModel))
-					viewModel.challanListLiveData.value = (list)
+					scannedList.add(RowBinningViewModel(binningModel))
+					viewModel.challanListLiveData.value = (scannedList)
 					
 					CoroutineScope(Dispatchers.IO).launch {
 						WareHouseDB.getDataBase(this@BinningActivity)?.wareHouseDao()
 							?.insertBinningChallan(binningModel)
 					}
 					
+				}else{
+					Toast.makeText(this, barcode.text+" already exists", Toast.LENGTH_LONG).show()
+					
 				}
 			}
 			
-			capture?.onResume()
 			
 		}
 		
@@ -175,6 +201,10 @@ class BinningActivity : AppCompatActivity() {
 				is BinningViewModel.EVENTS.SHOW_TOAST -> {
 					Toast.makeText(this, it.msg, Toast.LENGTH_LONG).show()
 				}
+				is BinningViewModel.EVENTS.NEXT -> {
+					capture?.onResume()
+				}
+				
 				
 				
 				else -> {}
@@ -200,6 +230,9 @@ class BinningActivity : AppCompatActivity() {
 						Toast.makeText(this, it.uploadResponse.errorMsg, Toast.LENGTH_SHORT).show()
 					}
 					
+				}
+				is RetrofitRepository.RequestType.DEFAULT ->{
+				
 				}
 				
 				else -> {}

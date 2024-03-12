@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:clickable="true"
+        android:padding="16dp"
         android:background="@color/white"
         android:backgroundTint="@color/white"
         android:onClick="@{vm.onFileSelected}">
@@ -25,7 +26,6 @@
             android:id="@+id/tv_file_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
             android:layout_marginEnd="16dp"
             android:fontFamily="@font/font_bold"
             android:text="@{vm.fileName}"
@@ -40,8 +40,6 @@
             android:id="@+id/tv_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
             android:background="@drawable/bg_round_orange"
             android:drawableStart="@drawable/ic_pending"
             android:fontFamily="@font/font_medium"
@@ -56,12 +54,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_count"
+            android:id="@+id/tv_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_file_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_file_name"
+            tools:text="Created On : 12-03-2024"/>
 
         <ImageView
             android:id="@+id/iv_arrow"
@@ -69,9 +68,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:src="@drawable/ic_arrow"
-            app:layout_constraintBottom_toBottomOf="@id/tv_count"
+            app:layout_constraintBottom_toBottomOf="@id/tv_date"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_count" />
+            app:layout_constraintTop_toTopOf="@id/tv_date" />
 
         <View
             android:layout_width="match_parent"
@@ -79,7 +78,7 @@
             android:layout_marginTop="16dp"
             android:alpha="0.1"
             android:background="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/tv_count" />
+            app:layout_constraintTop_toBottomOf="@id/tv_date" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

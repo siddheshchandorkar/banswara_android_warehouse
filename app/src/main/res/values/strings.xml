@@ -17,6 +17,9 @@
     <string name="error_user_name">Please Enter User Name</string>
     <string name="error_enter_pin">Please Enter PIN</string>
     <string name="error_enter_4_digit_valid_pin">Please enter 4 digit valid PIN</string>
+    <string name="error_enter_confirm_pin">Please Enter Confirm PIN</string>
+    <string name="error_enter_4_digit_valid_confirm_pin">Please enter 4 digit valid Confirm PIN</string>
+    <string name="pin_not_match">Enter PIN &amp; Confirm PIN does not match</string>
     <string name="error_enter_mobile_no">Please enter Mobile Number</string>
     <string name="error_valid_mobile">Please Enter valid 10 digit mobile number</string>
     <string name="proceed">Proceed</string>
@@ -26,6 +29,8 @@
     <string name="submit">Submit</string>
     <string name="add_new_file">Add New File</string>
     <string name="pending_files">Pending Files</string>
-    <string name="list_of_products_scanned">List of Products scanned</string>
+    <string name="list_of_products_scanned">List of Challan Scanned</string>
     <string name="logout">Logout</string>
+    <string name="scan_next">Scan Next</string>
+    <string name="confirm_pin">Confirm PIN</string>
 </resources>

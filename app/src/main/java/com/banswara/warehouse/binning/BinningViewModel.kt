@@ -61,10 +61,16 @@ class BinningViewModel(app: Application) : AndroidViewModel(app) {
 			events.value = EVENTS.UPLOAD_FILE
 		}
 	}
+	fun scanNext(view: View) {
+		if(locationValidation()){
+			events.value = EVENTS.NEXT
+		}
+	}
 	
 	sealed class EVENTS {
 		data object FETCH_FILE_CONTENT : EVENTS()
 		data object UPLOAD_FILE : EVENTS()
+		data object NEXT : EVENTS()
 		data object MOVE_TO_SUCCESS : EVENTS()
 		data class SHOW_TOAST(val msg : String) : EVENTS()
 	}

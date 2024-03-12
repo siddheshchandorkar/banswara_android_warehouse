@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 
-class SuccessViewModel(isLoginSuccess : Boolean, app : Application): AndroidViewModel(app) {
+class SuccessViewModel(isLoginSuccess : Boolean, file : String? ="", app : Application): AndroidViewModel(app) {
 	
 	val isFromLogin = ObservableField(isLoginSuccess)
 	val buttonText = ObservableField("")
@@ -16,7 +16,7 @@ class SuccessViewModel(isLoginSuccess : Boolean, app : Application): AndroidView
 			desc.set("Your account has been created successfully!")
 		}else{
 			buttonText.set("Back To Homepage")
-			desc.set("Items shipped to Ramesh Trader successfully!")
+			desc.set(file+" Dispatched successfully!")
 		}
 	}
 }

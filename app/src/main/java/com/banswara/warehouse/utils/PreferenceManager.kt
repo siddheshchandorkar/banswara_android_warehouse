@@ -27,6 +27,12 @@ object PreferenceManager {
 			sSharedPreference?.edit()?.putString(KEY_USER_DETAILS,"")?.apply()
 		}
 	}
+	fun logout(){
+		
+		val user = getUser()
+		user?.isLogout = true
+		saveUser(user)
+	}
 	
 	fun getUser(): LoginResponseModel? {
 		return Gson().fromJson(

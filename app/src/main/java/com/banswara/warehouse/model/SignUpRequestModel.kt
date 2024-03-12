@@ -11,6 +11,6 @@ data class SignUpRequestModel(
 	val userName: String,
 	@SerializedName("vMobile")
 	val mobileNumber: String,
-	@SerializedName("bActiveStatus")
+	@SerializedName("bActiveDevice")
 	val activeStatus: Boolean = true
 )
