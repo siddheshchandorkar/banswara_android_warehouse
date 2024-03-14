@@ -287,32 +287,32 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 							viewModel.challanListLiveData.value?.indexOfFirst {
 								(it as RowChallanViewModel).challanFileModel.fileContent == content.challan
 							}?.let { index ->
-								val file = FileContentModel(
-									content.challan,
-									viewModel.fileName.value!!,
-									STATUS_SCANNED
-								)
-								CoroutineScope(Dispatchers.IO).launch {
-									WareHouseDB.getDataBase(this@DispatchListActivity)
-										?.wareHouseDao()
-										?.insertChallan(file)
+								if(index!=-1){
+									val file = FileContentModel(
+										content.challan,
+										viewModel.fileName.value!!,
+										STATUS_SCANNED
+									)
+									CoroutineScope(Dispatchers.IO).launch {
+										WareHouseDB.getDataBase(this@DispatchListActivity)
+											?.wareHouseDao()
+											?.insertChallan(file)
+										
+									}
+									val row = RowChallanViewModel(file, this@DispatchListActivity)
+									row.status.set(StatusRetention.SCANNED)
+									row.statusValue = StatusRetention.SCANNED
+									row.challanFileModel.fileStatus = STATUS_SCANNED
 									
+									list.set(
+										index,
+										row
+									)
+									Log.d(
+										"Siddhesh",
+										"Check Scanned index ${content.challan}: " + (list.get(index) as RowChallanViewModel).challanFileModel
+									)
 								}
-								val row = RowChallanViewModel(file, this@DispatchListActivity)
-								row.status.set(StatusRetention.SCANNED)
-								row.statusValue = StatusRetention.SCANNED
-								row.challanFileModel.fileStatus = STATUS_SCANNED
-								
-								list.set(
-									index,
-									row
-								)
-								
-								
-								Log.d(
-									"Siddhesh",
-									"Check Scanned index ${content.challan}: " + (list.get(index) as RowChallanViewModel).challanFileModel
-								)
 								
 							}
 							

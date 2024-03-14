@@ -20,7 +20,9 @@ import com.banswara.warehouse.model.BaseRowModel
 import com.banswara.warehouse.model.ChallanFileModel
 import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.utils.PreferenceManager
+import com.banswara.warehouse.utils.RecyclerViewBindingAdapter
 import com.banswara.warehouse.utils.Utils
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -113,10 +115,24 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				is RetrofitRepository.RequestType.FETCH_FILES -> {
 					viewModel.isApiCalling.value = false
 					val list = arrayListOf<BaseRowModel>()
+					val listPending = arrayListOf<BaseRowModel>()
+					val listInProgress = arrayListOf<BaseRowModel>()
+					val listClose = arrayListOf<BaseRowModel>()
 					
 					
 					it.fetchFilesResponseModel.forEach { file ->
+						
 						list.add(RowFilesViewModel(this,file, this))
+						
+						if(file.status.equals("Closed")){
+							listClose.add(RowFilesViewModel(this,file, this))
+						}
+						if(file.status.equals("InProgress")){
+							listInProgress.add(RowFilesViewModel(this,file, this))
+						}
+						if(file.status.equals("Pending")){
+							listPending.add(RowFilesViewModel(this,file, this))
+						}
 						CoroutineScope(Dispatchers.IO).launch {
 							Log.d(
 								"Siddhesh",
@@ -126,6 +142,16 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 						}
 					}
 					viewModel.fileListLiveData.value = (list)
+					
+					val listTabs = arrayListOf<BaseRowModel>()
+					
+					listTabs.add(RowTabsViewModel(context = this, listPending))
+					listTabs.add(RowTabsViewModel(context = this, listInProgress))
+					listTabs.add(RowTabsViewModel(context = this, listClose))
+					
+					viewModel.tabsLiveData.value = (listTabs)
+					
+					setViewPagerData()
 				}
 				
 				is RetrofitRepository.RequestType.DEFAULT -> {
@@ -137,20 +163,31 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		}
 		onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
 			override fun handleOnBackPressed() {
-				if (viewModel.isDispatch.value!!) {
-					viewModel.isDispatch.value = false
-					viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
-					
-				} else if (viewModel.isBinning.value!!) {
-					viewModel.isBinning.value = false
-					viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
-					
-				} else
-					finish()
+				backFlowHandle()
 			}
 		})
+		
+		
 	}
 	
+	private fun setViewPagerData(){
+		binding.viewPager.setAdapter(RecyclerViewBindingAdapter(viewModel.tabsLiveData.value!!))
+		
+		TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+			when (position) {
+				0 -> {
+					tab.text = "Pending"
+				}
+				1 -> {
+					tab.text = "In Progress"
+				}
+				2 -> {
+					tab.text = "Closed"
+				}
+				
+			}
+		}.attach()
+	}
 	/*override fun onCreateOptionsMenu(menu: Menu): Boolean {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		menuInflater.inflate(R.menu.logout, menu)
@@ -161,17 +198,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			android.R.id.home -> {
-				if (viewModel.isDispatch.value!!) {
-					viewModel.isDispatch.value = false
-					viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
-					
-				} else if (viewModel.isBinning.value!!) {
-					viewModel.isBinning.value = false
-					viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
-					
-				} else {
-					confirmLogout()
-				}
+				backFlowHandle()
 			}
 			
 			R.id.logout -> {
@@ -180,6 +207,20 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 			
 		}
 		return super.onOptionsItemSelected(item)
+	}
+	
+	private fun backFlowHandle() {
+		if (viewModel.isDispatch.value!!) {
+			viewModel.isDispatch.value = false
+			viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
+			
+		} else if (viewModel.isBinning.value!!) {
+			viewModel.isBinning.value = false
+			viewModel.title.value = "Hi, " + PreferenceManager.getUser()?.userName
+			
+		} else {
+			confirmLogout()
+		}
 	}
 	
 	fun confirmLogout() {

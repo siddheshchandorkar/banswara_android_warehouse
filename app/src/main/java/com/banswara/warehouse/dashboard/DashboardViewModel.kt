@@ -13,6 +13,7 @@ class DashboardViewModel(val app: Application) : AndroidViewModel(app) {
 	
 	var fileListLiveData: MutableLiveData<ArrayList<BaseRowModel>> =
 		MutableLiveData<ArrayList<BaseRowModel>>()
+	
 	var binningFileListLiveData: MutableLiveData<ArrayList<BaseRowModel>> =
 		MutableLiveData<ArrayList<BaseRowModel>>()
 	val events = MutableLiveData<DASHBOARD_EVENTS>()
@@ -21,10 +22,13 @@ class DashboardViewModel(val app: Application) : AndroidViewModel(app) {
 	val isDispatch: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
 	val isBinning: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
 	val user: LoginResponseModel? = PreferenceManager.getUser()
+	var tabsLiveData: MutableLiveData<ArrayList<BaseRowModel>> =
+		MutableLiveData<ArrayList<BaseRowModel>>()
 	
 	init {
 		fileListLiveData.value = (arrayListOf<BaseRowModel>())
 		binningFileListLiveData.value = (arrayListOf<BaseRowModel>())
+		tabsLiveData.value = arrayListOf<BaseRowModel>()
 	}
 	
 	fun binningClick(view: View) {
@@ -40,7 +44,8 @@ class DashboardViewModel(val app: Application) : AndroidViewModel(app) {
 	}
 	
 	fun dispatchClick(view: View) {
-		fileListLiveData.value?.let {
+		isDispatch.value = true
+		/*fileListLiveData.value?.let {
 			if (it.isNotEmpty()) {
 				title.value = "Dispatch Process"
 				isDispatch.value = true
@@ -49,7 +54,7 @@ class DashboardViewModel(val app: Application) : AndroidViewModel(app) {
 			}
 		}?:run {
 			Toast.makeText(app, "Please Complete atleast 1 Binning process", Toast.LENGTH_SHORT).show()
-		}
+		}*/
 		
 		
 	}
