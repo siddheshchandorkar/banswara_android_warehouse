@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:fontFamily="@font/font_medium"
-            android:text="@string/list_of_products_scanned"
+            android:text="@{vm.detailsText}"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"

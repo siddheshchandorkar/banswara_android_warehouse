@@ -1,12 +1,10 @@
 package com.banswara.warehouse.dashboard
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -118,7 +116,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					
 					
 					it.fetchFilesResponseModel.forEach { file ->
-						list.add(RowFilesViewModel(file, this))
+						list.add(RowFilesViewModel(this,file, this))
 						CoroutineScope(Dispatchers.IO).launch {
 							Log.d(
 								"Siddhesh",
@@ -130,7 +128,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					viewModel.fileListLiveData.value = (list)
 				}
 				
-				is RetrofitRepository.RequestType.DEFAULT ->{
+				is RetrofitRepository.RequestType.DEFAULT -> {
 				
 				}
 				
@@ -184,17 +182,18 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		return super.onOptionsItemSelected(item)
 	}
 	
-	fun confirmLogout(){
+	fun confirmLogout() {
 		AlertDialog.Builder(this)
 			.setMessage("Are you sure you want to Logout?")
 			.setCancelable(false)
-			.setPositiveButton("Yes"
+			.setPositiveButton(
+				"Yes"
 			) { dialog, id ->
-					PreferenceManager.logout()
-					val intent = Intent(this, LoginActivity::class.java)
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-					startActivity(intent)
-					finish()
+				PreferenceManager.logout()
+				val intent = Intent(this, LoginActivity::class.java)
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+				startActivity(intent)
+				finish()
 				
 			}
 			.setNegativeButton("No", null)
@@ -203,13 +202,33 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 	
 	
 	override fun onFileSelect(challanFileModel: ChallanFileModel) {
-		challanFileModel.fileStatus = "In Progress"
+		challanFileModel.fileStatus = "InProgress"
 		CoroutineScope(Dispatchers.IO).launch {
 			WareHouseDB.getDataBase(this@DashboardActivity)?.wareHouseDao()
 				?.updateFileStatus(challanFileModel)
 		}
 		val intent = Intent(this, DispatchListActivity::class.java)
 		intent.putExtra(DispatchListActivity.KEY_FILE_NAME, challanFileModel.fileName)
+		
+		if (!TextUtils.isEmpty(challanFileModel.deviceId)) {
+			if (challanFileModel.deviceId.equals(Utils.getDeviceId(contentResolver))) {
+				intent.putExtra(DispatchListActivity.KEY_IS_EDITABLE, true)
+			} else {
+				intent.putExtra(DispatchListActivity.KEY_IS_EDITABLE, false)
+				intent.putExtra(DispatchListActivity.KEY_FILE_IN_PROGRESS, true)
+				
+			}
+		} else {
+			intent.putExtra(DispatchListActivity.KEY_IS_EDITABLE, true)
+		}
+		
+		if (challanFileModel.status.equals("InProgress")) {
+			intent.putExtra(DispatchListActivity.KEY_FILE_IN_PROGRESS, true)
+		} else if (challanFileModel.status.equals("Closed")) {
+			intent.putExtra(DispatchListActivity.KEY_IS_EDITABLE, false)
+			intent.putExtra(DispatchListActivity.KEY_IS_CLOSE, true)
+		}
+		
 		startActivity(intent)
 	}
 	

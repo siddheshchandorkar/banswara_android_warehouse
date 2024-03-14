@@ -17,9 +17,13 @@ import com.banswara.warehouse.dashboard.DashboardActivity
 import com.banswara.warehouse.database.WareHouseDB
 import com.banswara.warehouse.databinding.ActivityDispatchBinding
 import com.banswara.warehouse.model.BaseRowModel
+import com.banswara.warehouse.model.BinningChallanModel
+import com.banswara.warehouse.model.FileContentModel
 import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.success.SuccessActivity
+import com.banswara.warehouse.utils.PENDING
 import com.banswara.warehouse.utils.StatusRetention
+import com.banswara.warehouse.utils.StatusRetention.STATUS_SCANNED
 import com.banswara.warehouse.utils.Utils
 import com.journeyapps.barcodescanner.CaptureManager
 import kotlinx.coroutines.CoroutineScope
@@ -47,10 +51,25 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_dispatch)
 		
 		intent?.let {
+			var isProgress = false
+			if (it.hasExtra(KEY_FILE_IN_PROGRESS)) {
+				isProgress = it.getBooleanExtra(KEY_FILE_IN_PROGRESS, false)
+			}
 			if (it.hasExtra(KEY_FILE_NAME)) {
 				val fileName = it.getStringExtra(KEY_FILE_NAME) ?: ""
-				viewModel = DispatchViewModel(fileName, application)
+				viewModel = DispatchViewModel(fileName, isProgress, application)
+				if (it.hasExtra(KEY_IS_EDITABLE)) {
+					val edit = it.getBooleanExtra(KEY_IS_EDITABLE, true)
+					viewModel.editable.value = edit
+					
+				}
+				if (it.hasExtra(KEY_IS_CLOSE)) {
+					val edit = it.getBooleanExtra(KEY_IS_CLOSE, false)
+					viewModel.close.value = edit
+				}
 			}
+			
+			
 		}
 		
 		binding.vm = viewModel
@@ -86,11 +105,9 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					list.forEach {
 						if (it is RowChallanViewModel) {
 							if (it.challanNo.get() == code && it.status.get() != StatusRetention.SCANNED) {
-//									rowScanned = it
-								
 								it.status.set(StatusRetention.SCANNED)
 								it.statusValue = StatusRetention.SCANNED
-								it.challanFileModel.fileStatus = StatusRetention.STATUS_SCANNED
+								it.challanFileModel.fileStatus = STATUS_SCANNED
 								
 								
 								//status change to update in db
@@ -111,6 +128,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					Log.d("Siddhesh", "Checking status after scan " + allChallanScan)
 					
 					list.sortBy { (it as RowChallanViewModel).statusValue }
+					
 					viewModel.challanListLiveData.value = list
 					viewModel.allScanned.value = allChallanScan
 					
@@ -120,6 +138,12 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					capture?.onResume()
 				}
 				
+			}
+		}
+		
+		viewModel.challanListLiveData.observe(this) {
+			CoroutineScope(Dispatchers.Main).launch {
+				checkAllChallanScanned()
 			}
 		}
 		
@@ -136,19 +160,61 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 							)
 						}
 					}
+					
+					
 				}
 				
 				DispatchViewModel.EVENTS.PROCESS_FILE -> {
-					if (Utils.isInternetConnected(application)) {
-						
-						CoroutineScope(Dispatchers.IO).launch {
-							viewModel.isApiCalling.postValue(true)
-							RetrofitRepository.instance.dispatchScannedFile(
-								viewModel.user!!.userId,
-								Utils.getDeviceId(contentResolver),
-								viewModel.fileName.value!!
-							)
+					if (checkAllChallanScanned()) {
+						if (Utils.isInternetConnected(application)) {
+							val challanList = ArrayList<BinningChallanModel>()
+							viewModel.challanListLiveData.value?.forEach {
+								if (it is RowChallanViewModel) {
+									challanList.add(BinningChallanModel(it.challanFileModel.fileContent))
+								}
+							}
+							CoroutineScope(Dispatchers.IO).launch {
+								viewModel.isApiCalling.postValue(true)
+								RetrofitRepository.instance.dispatchScannedFile(
+									viewModel.user!!.userId,
+									Utils.getDeviceId(contentResolver),
+									viewModel.fileName.value!!, challanList
+								)
+							}
 						}
+					} else {
+						Toast.makeText(this, "Please Scan all challan", Toast.LENGTH_SHORT).show()
+					}
+					
+				}
+				
+				DispatchViewModel.EVENTS.SAVE_FILE -> {
+					if (Utils.isInternetConnected(application)) {
+						val challanList = ArrayList<BinningChallanModel>()
+						viewModel.challanListLiveData.value?.forEach {
+							if (it is RowChallanViewModel) {
+								if (it.challanFileModel.fileStatus == STATUS_SCANNED) {
+									challanList.add(BinningChallanModel(it.challanFileModel.fileContent))
+								}
+							}
+						}
+						if (challanList.isNotEmpty()) {
+							CoroutineScope(Dispatchers.IO).launch {
+								viewModel.isApiCalling.postValue(true)
+								RetrofitRepository.instance.saveScannedFile(
+									viewModel.user!!.userId,
+									Utils.getDeviceId(contentResolver),
+									viewModel.fileName.value!!, challanList
+								)
+							}
+						} else {
+							Toast.makeText(
+								this,
+								"Please scan atleast one challan",
+								Toast.LENGTH_SHORT
+							).show()
+						}
+						
 					}
 				}
 				
@@ -168,16 +234,104 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 				is RetrofitRepository.RequestType.FETCH_FILE_CONTENT -> {
 					viewModel.isApiCalling.value = false
 					val list = arrayListOf<BaseRowModel>()
+					
 					it.fetchContentResponseModel.forEach { content ->
 						content.fileName = viewModel.fileName.value!!
-						content.fileStatus = StatusRetention.STATUS_PENDING
-						list.add(RowChallanViewModel(content, this))
+						val row = RowChallanViewModel(content, this)
+						
+						if(viewModel.close.value ==true){
+							row.status.set(StatusRetention.SCANNED)
+							row.statusValue = StatusRetention.SCANNED
+							row.challanFileModel.fileStatus = STATUS_SCANNED
+							
+						}else{
+							row.status.set(StatusRetention.PENDING)
+							row.statusValue = StatusRetention.PENDING
+							row.challanFileModel.fileStatus = StatusRetention.STATUS_PENDING
+						}
+						
+						list.add(row)
 						CoroutineScope(Dispatchers.IO).launch {
 							WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()
 								?.insertChallan(content)
 						}
 					}
 					viewModel.challanListLiveData.value = (list)
+					if(viewModel.close.value ==false){
+						if (viewModel.isPartialFile.value == true) {
+							viewModel.isApiCalling.postValue(true)
+							CoroutineScope(Dispatchers.IO).launch {
+								RetrofitRepository.instance.fetchPartialChallan(
+									viewModel.user!!.userId,
+									Utils.getDeviceId(contentResolver),
+									viewModel.fileName.value!!
+								)
+							}
+						} else {
+							CoroutineScope(Dispatchers.IO).launch {
+								checkDBDetails()
+							}
+						}
+					}
+					
+				}
+				
+				is RetrofitRepository.RequestType.FETCH_PARTIAL_FILE -> {
+					viewModel.isApiCalling.value = false
+					CoroutineScope(Dispatchers.Main).launch {
+						val list = arrayListOf<BaseRowModel>()
+						viewModel.challanListLiveData.value?.forEach {
+							list.add(it)
+						}
+						it.partialFileResponseModel.challanList?.forEach { content ->
+							viewModel.challanListLiveData.value?.indexOfFirst {
+								(it as RowChallanViewModel).challanFileModel.fileContent == content.challan
+							}?.let { index ->
+								val file = FileContentModel(
+									content.challan,
+									viewModel.fileName.value!!,
+									STATUS_SCANNED
+								)
+								CoroutineScope(Dispatchers.IO).launch {
+									WareHouseDB.getDataBase(this@DispatchListActivity)
+										?.wareHouseDao()
+										?.insertChallan(file)
+									
+								}
+								val row = RowChallanViewModel(file, this@DispatchListActivity)
+								row.status.set(StatusRetention.SCANNED)
+								row.statusValue = StatusRetention.SCANNED
+								row.challanFileModel.fileStatus = STATUS_SCANNED
+								
+								list.set(
+									index,
+									row
+								)
+								
+								
+								Log.d(
+									"Siddhesh",
+									"Check Scanned index ${content.challan}: " + (list.get(index) as RowChallanViewModel).challanFileModel
+								)
+								
+							}
+							
+						}
+						list.sortBy { (it as RowChallanViewModel).statusValue }
+						viewModel.challanListLiveData.value = (list)
+						checkDBDetails()
+					}
+				}
+				
+				is RetrofitRepository.RequestType.SAVE_PARTIAL_FILE -> {
+					Toast.makeText(
+						this,
+						it.savePartialFile.errorMsg,
+						Toast.LENGTH_SHORT
+					).show()
+					if (it.savePartialFile.errorMsg.equals("File save successfully.")) {
+						finish()
+					}
 					
 				}
 				
@@ -196,13 +350,98 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					
 					
 				}
-				is RetrofitRepository.RequestType.DEFAULT ->{
+				
+				is RetrofitRepository.RequestType.DEFAULT -> {
 				
 				}
 				
 				else -> {}
 			}
 		}
+	}
+	
+	private fun checkAllChallanScanned(): Boolean {
+		var allChallanScan = true
+		var totalCount = 0
+		var totalScanned = 0
+		try {
+			viewModel.challanListLiveData.value?.let {
+				totalCount = it.size
+				val list: ArrayList<BaseRowModel> = ArrayList()
+				it.forEach {
+					list.add(it)
+				}
+				
+				list.forEach {
+					if (it is RowChallanViewModel) {
+						if (it.status.get() == StatusRetention.SCANNED) {
+							totalScanned++
+						} else {
+							allChallanScan = false
+						}
+					}
+				}
+				
+				viewModel.allScanned.postValue(allChallanScan)
+				viewModel.totalCount.postValue(totalCount)
+				viewModel.totalScanned.postValue(totalScanned)
+				viewModel.detailsText.postValue(
+					getString(
+						R.string.list_of_challans_scanned_total,
+						totalScanned.toString(),
+						totalCount.toString()
+					)
+				)
+			}
+		} catch (e: Throwable) {
+			e.printStackTrace()
+			viewModel.allScanned.postValue(false)
+			
+		}
+		return allChallanScan
+	}
+	
+	fun checkDBDetails() {
+		val dbList = WareHouseDB.getDataBase(this@DispatchListActivity)
+			?.wareHouseDao()
+			?.getDispatchChallanByFile(viewModel.fileName.value ?: "", STATUS_SCANNED)
+		val list = arrayListOf<BaseRowModel>()
+		viewModel.challanListLiveData.value?.forEach {
+			list.add(it)
+		}
+		dbList?.forEach { content ->
+			Log.d("Siddhesh", "Checking DB ${content.fileContent}: " + content.fileStatus)
+			list?.indexOfFirst {
+				(it as RowChallanViewModel).challanFileModel.fileContent == content.fileContent
+			}?.let { index ->
+				if (index != -1) {
+					
+					val file = FileContentModel(
+						content.fileContent,
+						viewModel.fileName.value!!,
+						STATUS_SCANNED
+					)
+					
+					val row = RowChallanViewModel(file, this@DispatchListActivity)
+					row.status.set(StatusRetention.SCANNED)
+					row.statusValue = StatusRetention.SCANNED
+					row.challanFileModel.fileStatus = STATUS_SCANNED
+					
+					list.set(index, row)
+					
+					CoroutineScope(Dispatchers.IO).launch {
+						WareHouseDB.getDataBase(this@DispatchListActivity)
+							?.wareHouseDao()
+							?.insertChallan(file)
+						
+					}
+				}
+				
+			}
+		}
+		list.sortBy { (it as RowChallanViewModel).statusValue }
+		viewModel.challanListLiveData.postValue(list)
+		
 	}
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -260,6 +499,9 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 	
 	companion object {
 		const val KEY_FILE_NAME = "file_name"
+		const val KEY_FILE_IN_PROGRESS = "in_progress"
+		const val KEY_IS_EDITABLE = "is_editable"
+		const val KEY_IS_CLOSE = "is_close"
 	}
 	
 	override fun onChallanClick(challanRow: RowChallanViewModel) {

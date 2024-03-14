@@ -81,6 +81,15 @@ class BinningActivity : AppCompatActivity() {
 			supportActionBar?.title = "Binning Process"
 		}
 		
+		viewModel.challanListLiveData.observe(this) {
+			if (it.isNotEmpty()) {
+				viewModel.detailsText.value = "List of Challan Scanned (Total Count : ${it.size})"
+				
+			} else {
+				viewModel.detailsText.value = "List of Challan Scanned"
+			}
+		}
+		
 		RetrofitRepository.instance.apiLiveData.value = RetrofitRepository.RequestType.DEFAULT
 		
 		supportActionBar?.let {
@@ -168,6 +177,8 @@ class BinningActivity : AppCompatActivity() {
 			}
 			
 			
+			
+			
 		}
 		
 		viewModel.events.observe(this) {
@@ -204,8 +215,6 @@ class BinningActivity : AppCompatActivity() {
 				is BinningViewModel.EVENTS.NEXT -> {
 					capture?.onResume()
 				}
-				
-				
 				
 				else -> {}
 			}

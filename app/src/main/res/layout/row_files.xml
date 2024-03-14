@@ -36,28 +36,26 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Testing"/>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_round_orange"
-            android:drawableStart="@drawable/ic_pending"
             android:fontFamily="@font/font_medium"
-            android:paddingStart="5dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="3dp"
-            android:text="Pending"
+            android:padding="5dp"
+            android:text="@{vm.status}"
+            tools:text="Pending"
             android:textColor="@color/white"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@{vm.statusColor}"/>
 
         <TextView
             android:id="@+id/tv_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:text="@{vm.date}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_file_name"
             tools:text="Created On : 12-03-2024"/>

@@ -27,10 +27,10 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleTextColor="@color/c_113656"
-                android:backgroundTint="@color/white"
                 android:background="@color/white"
-                app:title="@{vm.fileName}" />
+                android:backgroundTint="@color/white"
+                app:title="@{vm.fileName}"
+                app:titleTextColor="@color/c_113656" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <com.journeyapps.barcodescanner.DecoratedBarcodeView
@@ -38,11 +38,26 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:visibility="@{vm.editable}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/app_bar"
-            app:zxing_scanner_layout="@layout/custom_barcode_scanner"/>
+            app:zxing_scanner_layout="@layout/custom_barcode_scanner" />
 
+        <TextView
+            android:id="@+id/tv_details"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"
+            android:textSize="16sp"
+            android:fontFamily="@font/font_medium"
+            android:textColor="@color/black"
+            android:text="@{vm.detailsText}"
+            tools:text="List of Challans"
+            app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv_files"
@@ -52,35 +67,67 @@
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/btn_shipped"
-            app:layout_constraintTop_toBottomOf="@id/zxing_barcode_scanner"
+            app:layout_constraintTop_toBottomOf="@id/tv_details"
             app:setRowData="@{vm.challanListLiveData}" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_shipped"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:backgroundTint="@color/c_C49D4F"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/bg_button"
-            android:enabled="@{vm.allScanned}"
-            android:visibility="@{!vm.isApiCalling}"
+            android:backgroundTint="@color/c_C49D4F"
             android:focusable="false"
-            android:onClick="@{vm.onShipped}"
             android:fontFamily="@font/open_sans_bold"
+            android:onClick="@{vm.onDispatch}"
             android:text="Dispatch"
             android:textColor="@color/white"
+            android:visibility="@{!vm.isApiCalling &amp;&amp; vm.editable}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:visibility="gone"/>
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_button"
+            android:backgroundTint="@color/c_C49D4F"
+            android:enabled="@{vm.saveEnable}"
+            android:focusable="false"
+            android:fontFamily="@font/open_sans_bold"
+            android:onClick="@{vm.onSave}"
+            android:text="Save"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline"
+            android:textColor="@color/white"
+            android:visibility="@{!vm.isApiCalling &amp;&amp; !vm.allScanned &amp;&amp; vm.editable}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="visible" />
 
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:layout_margin="16dp"
             android:progressTint="@color/c_C49D4F"
             android:visibility="@{vm.isApiCalling}"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="gone" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

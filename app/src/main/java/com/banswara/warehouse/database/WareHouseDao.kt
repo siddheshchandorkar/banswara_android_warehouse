@@ -47,6 +47,8 @@ interface WareHouseDao {
 	fun updateChallanStatus(fileContentModel: FileContentModel)
 	
 	//Get Challan list for corresponding file
+	@Query("SELECT * FROM 'challan_details'  WHERE file_name= :fileName AND file_status= :status")
+	fun getDispatchChallanByFile(fileName : String, status:String) : List<FileContentModel>
 	
 	
 	//Binning process

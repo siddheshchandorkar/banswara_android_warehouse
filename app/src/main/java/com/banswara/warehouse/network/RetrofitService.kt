@@ -31,7 +31,13 @@ interface RetrofitService {
 	
 	//Dispatch api
 	@POST("/Api/AppApi/Fn_Copy_File_Process")
-	fun dispatchFile(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<ProcessFileResponseModel>
+	fun dispatchFile(@Body readFileDataRequestModel: DispatchFileRequestModel): Call<ProcessFileResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Fetch_Partial_Challan")
+	fun fetchPartialChallan(@Body partialFileResponse: FetchPartialFileRequestModel): Call<FetchPartialFileResponseModel>
+	
+	@POST("/Api/AppApi/Fn_Save_Partial_Challan")
+	fun savePartialChallan(@Body readFileDataRequestModel: SavePartialFileRequestModel): Call<BaseResponseModel>
 	
 	@POST("/Api/AppApi/Fn_Change_User_Device")
 	fun changeUserDevice(@Body deviceChangeRequestModel: DeviceChangeRequestModel): Call<BaseResponseModel>

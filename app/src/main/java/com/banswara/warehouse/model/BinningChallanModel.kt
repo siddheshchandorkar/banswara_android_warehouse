@@ -10,5 +10,4 @@ import com.google.gson.annotations.SerializedName
 data class BinningChallanModel(
 	@SerializedName("vChallan")
 	var challan: String = ""
-	
 )

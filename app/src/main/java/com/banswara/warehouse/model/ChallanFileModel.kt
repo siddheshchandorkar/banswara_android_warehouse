@@ -18,8 +18,19 @@ data class ChallanFileModel(
 	
 	
 	@ColumnInfo(name = "file_status", defaultValue = StatusRetention.STATUS_PENDING)
-	@SerializedName("vStatus")
 	var fileStatus: String = "",
+	
+	@ColumnInfo(name = "status", defaultValue = StatusRetention.STATUS_PENDING)
+	@SerializedName("vStatus")
+	var status: String = "",
+	
+	@ColumnInfo(name = "created_date")
+	@SerializedName("vFileCreatedDate")
+	var createdDate: String = "",
+	
+	@ColumnInfo(name = "device_id")
+	@SerializedName("vDeviceId")
+	var deviceId: String = "",
 	
 	@Ignore
 	@SerializedName("vErrorMsg")

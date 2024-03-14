@@ -9,7 +9,7 @@ object StatusRetention {
 	const val SCANNED = 2
 	
 	const val STATUS_PENDING = "Pending"
-	const val STATUS_IN_PROGRESS = "In Progress"
+	const val STATUS_IN_PROGRESS = "InProgress"
 	const val STATUS_SCANNED = "Scanned"
 	
 	@Retention(AnnotationRetention.SOURCE)

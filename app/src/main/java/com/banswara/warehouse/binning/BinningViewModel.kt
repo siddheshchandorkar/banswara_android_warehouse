@@ -19,6 +19,7 @@ class BinningViewModel(app: Application) : AndroidViewModel(app) {
 	
 	val isApiCalling: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
 	val submitEnable: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+	val detailsText: MutableLiveData<String> = MutableLiveData<String>("List of Challan Scanned")
 	val user: LoginResponseModel? = PreferenceManager.getUser()
 	
 	var first: MutableLiveData<String> = MutableLiveData<String>()
@@ -36,22 +37,22 @@ class BinningViewModel(app: Application) : AndroidViewModel(app) {
 		if(TextUtils.isEmpty(first.value)){
 			events.value = EVENTS.SHOW_TOAST("Enter First Location")
 			return false
-		}else if(first.value!!.length< 2){
+		} /*else if(first.value!!.length< 2){
 			events.value = EVENTS.SHOW_TOAST("The first location should be at least 2 digits.")
 			return false
-		}else if(TextUtils.isEmpty(second.value)){
+		}*/else if(TextUtils.isEmpty(second.value)){
 			events.value = EVENTS.SHOW_TOAST("Enter Second Location")
 			return false
-		}else if(second.value!!.length< 2){
+		}/*else if(second.value!!.length< 2){
 			events.value = EVENTS.SHOW_TOAST("The Second location should be at least 2 digits.")
 			return false
-		}else if(TextUtils.isEmpty(third.value)){
+		}*/else if(TextUtils.isEmpty(third.value)){
 			events.value = EVENTS.SHOW_TOAST("Enter Third Location")
 			return false
-		}else if(third.value!!.length< 2){
+		}/*else if(third.value!!.length< 2){
 			events.value = EVENTS.SHOW_TOAST("The Third location should be at least 2 digits.")
 			return false
-		}
+		}*/
 			
 			return true
 	}

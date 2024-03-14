@@ -168,9 +168,9 @@ class RetrofitRepository {
 			})
 	}
 	
-	suspend fun dispatchScannedFile(useId: Int, deviceId: String, fileName: String) {
+	suspend fun dispatchScannedFile(useId: Int, deviceId: String, fileName: String, list :ArrayList<BinningChallanModel>) {
 		
-		retrofitService.dispatchFile(ReadFileDataRequestModel(useId, deviceId, fileName))
+		retrofitService.dispatchFile(DispatchFileRequestModel(userId = useId,deviceId= deviceId, fileName =  fileName, challanList = list))
 			.enqueue(object : Callback<ProcessFileResponseModel> {
 				
 				override fun onResponse(
@@ -189,6 +189,62 @@ class RetrofitRepository {
 				}
 				
 				override fun onFailure(call: Call<ProcessFileResponseModel>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
+	
+	suspend fun saveScannedFile(useId: Int, deviceId: String, fileName: String,  challanList: List<BinningChallanModel>) {
+		
+		retrofitService.savePartialChallan(SavePartialFileRequestModel(useId, deviceId, fileName, challanList=challanList))
+			.enqueue(object : Callback<BaseResponseModel> {
+				
+				override fun onResponse(
+					call: Call<BaseResponseModel>,
+					response: Response<BaseResponseModel>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.SAVE_PARTIAL_FILE(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<BaseResponseModel>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
+	
+	suspend fun fetchPartialChallan(useId: Int, deviceId: String, fileName: String) {
+		
+		retrofitService.fetchPartialChallan(FetchPartialFileRequestModel(useId, deviceId, fileName, activeDevice = true))
+			.enqueue(object : Callback<FetchPartialFileResponseModel> {
+				
+				override fun onResponse(
+					call: Call<FetchPartialFileResponseModel>,
+					response: Response<FetchPartialFileResponseModel>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.FETCH_PARTIAL_FILE(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<FetchPartialFileResponseModel>, t: Throwable) {
 					//set null list in case of failure
 					apiLiveData.value = null
 					t.printStackTrace()
@@ -233,6 +289,8 @@ class RetrofitRepository {
 		data class FETCH_FILE_CONTENT(val fetchContentResponseModel: List<FileContentModel>) :
 			RequestType()
 		data class DISPATCH_FILE(val processFileResponseModel: ProcessFileResponseModel) : RequestType()
+		data class FETCH_PARTIAL_FILE(val partialFileResponseModel: FetchPartialFileResponseModel) : RequestType()
+		data class SAVE_PARTIAL_FILE(val savePartialFile: BaseResponseModel) : RequestType()
 		data class UPLOAD_BINNING_FILE(val uploadResponse: BaseResponseModel) : RequestType()
 		
 	}
