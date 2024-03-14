@@ -11,8 +11,7 @@ import java.util.Date
 
 object Utils{
 	fun getDeviceId(contentResolver: ContentResolver): String {
-//		return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-		return "galaxys242023"
+		return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 	}
 	
 	fun currentDataInFormat(format: String): String {
