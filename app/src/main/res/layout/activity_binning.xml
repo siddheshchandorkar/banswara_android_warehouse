@@ -67,8 +67,8 @@
                 android:backgroundTint="@color/white"
                 app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
-                <EditText
-                    android:id="@+id/til_first"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_first"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
@@ -99,6 +99,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_warehouse">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_second"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"

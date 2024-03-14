@@ -1,6 +1,5 @@
 package com.banswara.warehouse.binning
 
-import android.R.id.edit
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
@@ -107,22 +106,7 @@ class BinningActivity : AppCompatActivity() {
 		capture?.decode()
 		changeLaserVisibility()
 		
-		binding.etThree.setOnEditorActionListener { v, actionId, event ->
-			if (actionId == EditorInfo.IME_ACTION_SEARCH
-				|| actionId == EditorInfo.IME_ACTION_DONE
-				|| event.action == KeyEvent.ACTION_DOWN
-				&& event.keyCode == KeyEvent.KEYCODE_ENTER
-			) {
-				binding.etThree.clearFocus()
-				val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-				imm.hideSoftInputFromWindow(binding.etThree.getWindowToken(), 0)
-				
-				return@setOnEditorActionListener true
-			}
-			return@setOnEditorActionListener false
-		}
-		
-		
+		setAllListener()
 		
 		viewModel.challanListLiveData.observe(this) {
 			viewModel.submitEnable.value = it.isNotEmpty()
@@ -134,11 +118,11 @@ class BinningActivity : AppCompatActivity() {
 			viewModel.challanListLiveData.value?.let {
 				scannedList.addAll(it)
 			}
-			Log.d("siddhhesh", "list size : "+scannedList.size)
+			Log.d("siddhhesh", "list size : " + scannedList.size)
 			
 			capture?.onPause()
 			if (viewModel.locationValidation()) {
-				
+
 //			beepManager?.playBeepSoundAndVibrate()
 				var contains = false
 				scannedList.forEach {
@@ -170,13 +154,11 @@ class BinningActivity : AppCompatActivity() {
 							?.insertBinningChallan(binningModel)
 					}
 					
-				}else{
-					Toast.makeText(this, barcode.text+" already exists", Toast.LENGTH_LONG).show()
+				} else {
+					Toast.makeText(this, barcode.text + " already exists", Toast.LENGTH_LONG).show()
 					
 				}
 			}
-			
-			
 			
 			
 		}
@@ -185,7 +167,7 @@ class BinningActivity : AppCompatActivity() {
 			when (it) {
 				
 				BinningViewModel.EVENTS.UPLOAD_FILE -> {
-					if(Utils.isInternetConnected(application)) {
+					if (Utils.isInternetConnected(application)) {
 						viewModel.user?.let { user ->
 							CoroutineScope(Dispatchers.IO).launch {
 								
@@ -201,7 +183,7 @@ class BinningActivity : AppCompatActivity() {
 									useId = user.userId.toString(),
 									deviceId = Utils.getDeviceId(contentResolver),
 									location = viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!,
-									date = Utils.currentDataInFormat("dd/MM/yyyy")?:"",
+									date = Utils.currentDataInFormat("dd/MM/yyyy") ?: "",
 									challans
 								)
 							}
@@ -212,6 +194,7 @@ class BinningActivity : AppCompatActivity() {
 				is BinningViewModel.EVENTS.SHOW_TOAST -> {
 					Toast.makeText(this, it.msg, Toast.LENGTH_LONG).show()
 				}
+				
 				is BinningViewModel.EVENTS.NEXT -> {
 					capture?.onResume()
 				}
@@ -227,7 +210,7 @@ class BinningActivity : AppCompatActivity() {
 				
 				is RetrofitRepository.RequestType.UPLOAD_BINNING_FILE -> {
 					
-					if(it.uploadResponse.errorMsg.equals("Challan added successfully.", true)){
+					if (it.uploadResponse.errorMsg.equals("Challan added successfully.", true)) {
 						Toast.makeText(this, it.uploadResponse.errorMsg, Toast.LENGTH_SHORT).show()
 						//delete binning details for this file
 						CoroutineScope(Dispatchers.IO).launch {
@@ -235,17 +218,79 @@ class BinningActivity : AppCompatActivity() {
 								?.deleteBinningChallanByFile(viewModel.first.value!! + "-" + viewModel.second.value!! + "-" + viewModel.third.value!!)
 						}
 						finish()
-					}else{
+					} else {
 						Toast.makeText(this, it.uploadResponse.errorMsg, Toast.LENGTH_SHORT).show()
 					}
 					
 				}
-				is RetrofitRepository.RequestType.DEFAULT ->{
+				
+				is RetrofitRepository.RequestType.DEFAULT -> {
 				
 				}
 				
 				else -> {}
 			}
+		}
+		
+	}
+	
+	private fun setAllListener() {
+		
+		viewModel.first.observe(this) {
+			if (!TextUtils.isEmpty(it) && it.length == 3) {
+				binding.etFirst.clearFocus()
+				if (!TextUtils.isEmpty(viewModel.second.value) && viewModel.second.value?.length == 3) {
+					if (!TextUtils.isEmpty(viewModel.third.value) && viewModel.third.value?.length == 3) {
+						val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+						imm.hideSoftInputFromWindow(binding.etThree.getWindowToken(), 0)
+					} else {
+						binding.etThree.requestFocus()
+						binding.etThree.setSelection(binding.etThree.text?.length?:0)
+					}
+				} else {
+					binding.etSecond.requestFocus()
+					binding.etSecond.setSelection(binding.etSecond.text?.length?:0)
+					
+				}
+			}
+		}
+		viewModel.second.observe(this) {
+			if (!TextUtils.isEmpty(it) && it.length == 3) {
+				binding.etSecond.clearFocus()
+				if (!TextUtils.isEmpty(viewModel.third.value) && viewModel.third.value?.length == 3) {
+					val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+					imm.hideSoftInputFromWindow(binding.etThree.getWindowToken(), 0)
+				} else {
+					binding.etThree.requestFocus()
+					binding.etThree.setSelection(binding.etThree.text?.length?:0)
+					
+				}
+			}
+			
+		}
+		viewModel.third.observe(this) {
+			if (!TextUtils.isEmpty(it) && it.length == 3) {
+				binding.etThree.clearFocus()
+				val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+				imm.hideSoftInputFromWindow(binding.etThree.getWindowToken(), 0)
+			}
+			
+		}
+		
+		
+		binding.etThree.setOnEditorActionListener { v, actionId, event ->
+			if (actionId == EditorInfo.IME_ACTION_SEARCH
+				|| actionId == EditorInfo.IME_ACTION_DONE
+				|| event.action == KeyEvent.ACTION_DOWN
+				&& event.keyCode == KeyEvent.KEYCODE_ENTER
+			) {
+				binding.etThree.clearFocus()
+				val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+				imm.hideSoftInputFromWindow(binding.etThree.getWindowToken(), 0)
+				
+				return@setOnEditorActionListener true
+			}
+			return@setOnEditorActionListener false
 		}
 		
 	}
