@@ -26,6 +26,9 @@ interface RetrofitService {
 	@POST("/Api/AppApi/Fn_Read_Directory_File")
 	fun fetchFiles(@Body fetchFilesRequestModel: FetchFilesRequestModel): Call<List<ChallanFileModel>>
 	
+	@POST("/Api/AppApi/Fn_Dispatch_File")
+	fun fetchCloseFiles(@Body fetchFilesRequestModel: FetchFilesRequestModel): Call<List<ChallanFileModel>>
+	
 	@POST("/Api/AppApi/Fn_Read_Text_File")
 	fun readFileData(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<List<FileContentModel>>
 	

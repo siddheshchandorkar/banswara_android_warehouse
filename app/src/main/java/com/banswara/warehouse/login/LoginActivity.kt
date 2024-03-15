@@ -50,16 +50,16 @@ class LoginActivity : AppCompatActivity() {
 			override fun handleOnBackPressed() {
 				if (!viewModel.isLogin.value!!) {
 					viewModel.isLogin.value = true
+					reset()
 				} else {
 					finish()
 				}
 			}
 		})
 		
-		
 		binding.ivBack.setOnClickListener {
 			viewModel.isLogin.value = true
-			
+			reset()
 		}
 		binding.ivClose.setOnClickListener {
 			finish()
@@ -75,12 +75,12 @@ class LoginActivity : AppCompatActivity() {
 			} else {
 				viewModel.signInEnable.value = viewModel.checkSignInValidations(false)
 			}
-			
-			
 		}
+		
 		viewModel.mobileNumber.observe(this) {
 			viewModel.signInEnable.value = viewModel.checkSignInValidations(false)
 		}
+		
 		viewModel.pin.observe(this) {
 			if (viewModel.isLogin.value!!) {
 				viewModel.loginEnable.value = viewModel.checkLoginValidations(false)
@@ -115,8 +115,6 @@ class LoginActivity : AppCompatActivity() {
 				
 			}
 		}
-		
-		
 		
 		//Login Screen Events Observers
 		viewModel.events.observe(this) {
@@ -181,7 +179,7 @@ class LoginActivity : AppCompatActivity() {
 							Toast.LENGTH_LONG
 						).show()
 						viewModel.isLogin.value = true
-						viewModel.pin.value = ""
+						reset()
 					} else {
 						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
 							.show()
@@ -207,7 +205,7 @@ class LoginActivity : AppCompatActivity() {
 							true
 						)
 					) {
-						viewModel.pin.value = ""
+						reset()
 						viewModel.isLogin.value = false
 						viewModel.isDeviceNotRegistered.value = true
 						Toast.makeText(
@@ -233,14 +231,8 @@ class LoginActivity : AppCompatActivity() {
 						)
 							.show()
 						viewModel.isLogin.value = true
-						viewModel.userName.value = ""
-						viewModel.mobileNumber.value = ""
-						viewModel.pin.value = ""
-						viewModel.confirmPin.value = ""
-						binding.etUserName.clearFocus()
-						binding.etMobileNumber.clearFocus()
-						binding.etPin.clearFocus()
-						binding.etConfirmPin.clearFocus()
+						reset()
+						
 					} else {
 						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
 							.show()
@@ -252,6 +244,18 @@ class LoginActivity : AppCompatActivity() {
 			}
 		}
 		
+	}
+	
+	private fun reset() {
+		
+		viewModel.userName.value = ""
+		viewModel.mobileNumber.value = ""
+		viewModel.pin.value = ""
+		viewModel.confirmPin.value = ""
+		binding.etUserName.clearFocus()
+		binding.etMobileNumber.clearFocus()
+		binding.etPin.clearFocus()
+		binding.etConfirmPin.clearFocus()
 	}
 	
 }

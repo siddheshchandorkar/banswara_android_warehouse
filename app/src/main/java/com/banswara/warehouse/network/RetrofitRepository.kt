@@ -139,6 +139,33 @@ class RetrofitRepository {
 				}
 			})
 	}
+	suspend fun fetchCloseFiles(useId: Int, deviceId: String) {
+		
+		retrofitService.fetchCloseFiles(FetchFilesRequestModel(useId, deviceId))
+			.enqueue(object : Callback<List<ChallanFileModel>> {
+				
+				override fun onResponse(
+					call: Call<List<ChallanFileModel>>,
+					response: Response<List<ChallanFileModel>>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.FETCH_CLOSE_FILES(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<List<ChallanFileModel>>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
 	
 	suspend fun fetchContent(useId: Int, deviceId: String, fileName: String) {
 		
@@ -286,6 +313,7 @@ class RetrofitRepository {
 		data class SIGN_UP(val baseResponseModel: BaseResponseModel) : RequestType()
 		data class DEVICE_CHANGE(val baseResponseModel: BaseResponseModel) : RequestType()
 		data class FETCH_FILES(val fetchFilesResponseModel: List<ChallanFileModel>) : RequestType()
+		data class FETCH_CLOSE_FILES(val fetchFilesResponseModel: List<ChallanFileModel>) : RequestType()
 		data class FETCH_FILE_CONTENT(val fetchContentResponseModel: List<FileContentModel>) :
 			RequestType()
 		data class DISPATCH_FILE(val processFileResponseModel: ProcessFileResponseModel) : RequestType()

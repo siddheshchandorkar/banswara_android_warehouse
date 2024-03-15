@@ -221,7 +221,7 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 				DispatchViewModel.EVENTS.MOVE_TO_SUCCESS -> {
 					val intent = Intent(this, SuccessActivity::class.java)
 					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, false)
-					intent.putExtra(SuccessActivity.KEY_FROM_LOGIN, viewModel.fileName.value!!)
+					intent.putExtra(SuccessActivity.KEY_FILE_NAME, viewModel.fileName.value!!)
 					successLauncher.launch(intent)
 				}
 			}
@@ -236,25 +236,30 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					val list = arrayListOf<BaseRowModel>()
 					
 					it.fetchContentResponseModel.forEach { content ->
-						content.fileName = viewModel.fileName.value!!
-						val row = RowChallanViewModel(content, this)
-						
-						if(viewModel.close.value ==true){
-							row.status.set(StatusRetention.SCANNED)
-							row.statusValue = StatusRetention.SCANNED
-							row.challanFileModel.fileStatus = STATUS_SCANNED
-							
+						if(content.errorMsg.equals("Directory is missing.")){
+							Toast.makeText(this, content.errorMsg+" for "+viewModel.fileName.value, Toast.LENGTH_SHORT).show()
 						}else{
-							row.status.set(StatusRetention.PENDING)
-							row.statusValue = StatusRetention.PENDING
-							row.challanFileModel.fileStatus = StatusRetention.STATUS_PENDING
+							content.fileName = viewModel.fileName.value!!
+							val row = RowChallanViewModel(content, this)
+							
+							if(viewModel.close.value ==true){
+								row.status.set(StatusRetention.SCANNED)
+								row.statusValue = StatusRetention.SCANNED
+								row.challanFileModel.fileStatus = STATUS_SCANNED
+								
+							}else{
+								row.status.set(StatusRetention.PENDING)
+								row.statusValue = StatusRetention.PENDING
+								row.challanFileModel.fileStatus = StatusRetention.STATUS_PENDING
+							}
+							
+							list.add(row)
+							CoroutineScope(Dispatchers.IO).launch {
+								WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()
+									?.insertChallan(content)
+							}
 						}
 						
-						list.add(row)
-						CoroutineScope(Dispatchers.IO).launch {
-							WareHouseDB.getDataBase(this@DispatchListActivity)?.wareHouseDao()
-								?.insertChallan(content)
-						}
 					}
 					viewModel.challanListLiveData.value = (list)
 					if(viewModel.close.value ==false){

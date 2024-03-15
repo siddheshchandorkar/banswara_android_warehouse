@@ -115,11 +115,6 @@ class LoginViewModel(val app: Application) : AndroidViewModel(app) {
 		
 		return true
 	}
-	
-	fun backToLogin(view: View) {
-		isLogin.value = true
-	}
-	
 	sealed class LoginEvents {
 		
 		data object LOGIN : LoginEvents()

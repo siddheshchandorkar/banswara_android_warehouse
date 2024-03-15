@@ -33,6 +33,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 	
 	private lateinit var viewModel: DashboardViewModel
 	private lateinit var binding: ActivityDashboardBinding
+	val listTabs = arrayListOf<BaseRowModel>()
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -111,27 +112,28 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		}
 		
 		RetrofitRepository.instance.apiLiveData.observe(this) { it ->
+			viewModel.isApiCalling.postValue(false)
 			when (it) {
 				is RetrofitRepository.RequestType.FETCH_FILES -> {
+					listTabs.clear()
 					viewModel.isApiCalling.value = false
 					val list = arrayListOf<BaseRowModel>()
 					val listPending = arrayListOf<BaseRowModel>()
 					val listInProgress = arrayListOf<BaseRowModel>()
-					val listClose = arrayListOf<BaseRowModel>()
 					
 					
 					it.fetchFilesResponseModel.forEach { file ->
 						
-						list.add(RowFilesViewModel(this,file, this))
+						list.add(RowFilesViewModel(this, file, this))
 						
-						if(file.status.equals("Closed")){
+						/*if(file.status.equals("Closed")){
 							listClose.add(RowFilesViewModel(this,file, this))
+						}*/
+						if (file.status.equals("InProgress")) {
+							listInProgress.add(RowFilesViewModel(this, file, this))
 						}
-						if(file.status.equals("InProgress")){
-							listInProgress.add(RowFilesViewModel(this,file, this))
-						}
-						if(file.status.equals("Pending")){
-							listPending.add(RowFilesViewModel(this,file, this))
+						if (file.status.equals("Pending")) {
+							listPending.add(RowFilesViewModel(this, file, this))
 						}
 						CoroutineScope(Dispatchers.IO).launch {
 							Log.d(
@@ -141,16 +143,31 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 							)
 						}
 					}
-					viewModel.fileListLiveData.value = (list)
-					
-					val listTabs = arrayListOf<BaseRowModel>()
 					
 					listTabs.add(RowTabsViewModel(context = this, listPending))
 					listTabs.add(RowTabsViewModel(context = this, listInProgress))
+					if (Utils.isInternetConnected(application)) {
+						
+						viewModel.user?.let { user ->
+							CoroutineScope(Dispatchers.IO).launch {
+								viewModel.isApiCalling.postValue(true)
+								RetrofitRepository.instance.fetchCloseFiles(
+									user.userId,
+									Utils.getDeviceId(contentResolver)
+								)
+							}
+						}
+					}
+					
+				}
+				
+				is RetrofitRepository.RequestType.FETCH_CLOSE_FILES -> {
+					val listClose = arrayListOf<BaseRowModel>()
+					it.fetchFilesResponseModel.forEach { file ->
+						listClose.add(RowFilesViewModel(this, file, this))
+					}
+					
 					listTabs.add(RowTabsViewModel(context = this, listClose))
-					
-					viewModel.tabsLiveData.value = (listTabs)
-					
 					setViewPagerData()
 				}
 				
@@ -170,7 +187,9 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		
 	}
 	
-	private fun setViewPagerData(){
+	private fun setViewPagerData() {
+		viewModel.tabsLiveData.value = (listTabs)
+		
 		binding.viewPager.setAdapter(RecyclerViewBindingAdapter(viewModel.tabsLiveData.value!!))
 		
 		TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
@@ -178,9 +197,11 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				0 -> {
 					tab.text = "Pending"
 				}
+				
 				1 -> {
 					tab.text = "In Progress"
 				}
+				
 				2 -> {
 					tab.text = "Closed"
 				}
