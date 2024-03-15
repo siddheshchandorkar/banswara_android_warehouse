@@ -3,6 +3,7 @@ package com.banswara.warehouse.dashboard
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.viewpager2.widget.ViewPager2
 import com.banswara.warehouse.R
 import com.banswara.warehouse.binning.BinningActivity
 import com.banswara.warehouse.database.WareHouseDB
@@ -26,6 +28,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.internal.notify
+import okhttp3.internal.notifyAll
 
 
 class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
@@ -34,6 +38,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 	private lateinit var viewModel: DashboardViewModel
 	private lateinit var binding: ActivityDashboardBinding
 	val listTabs = arrayListOf<BaseRowModel>()
+	var lastTabSelected = 0
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -63,6 +68,12 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				supportActionBar?.title = getString(R.string.banswara_warehouse)
 			}
 		}
+		listTabs.add(RowTabsViewModel(context = this, arrayListOf<BaseRowModel>()))
+		listTabs.add(RowTabsViewModel(context = this, arrayListOf<BaseRowModel>()))
+		listTabs.add(RowTabsViewModel(context = this, arrayListOf<BaseRowModel>()))
+		
+		setViewPagerData()
+		
 		viewModel.events.observe(this) {
 			when (it) {
 				
@@ -115,7 +126,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 			viewModel.isApiCalling.postValue(false)
 			when (it) {
 				is RetrofitRepository.RequestType.FETCH_FILES -> {
-					listTabs.clear()
+//					listTabs.clear()
 					viewModel.isApiCalling.value = false
 					val list = arrayListOf<BaseRowModel>()
 					val listPending = arrayListOf<BaseRowModel>()
@@ -143,9 +154,13 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 							)
 						}
 					}
+
+					listPending.sortByDescending { (it as RowFilesViewModel).challanFileModel.createdDate }
+					listInProgress.sortByDescending { (it as RowFilesViewModel).challanFileModel.createdDate }
 					
-					listTabs.add(RowTabsViewModel(context = this, listPending))
-					listTabs.add(RowTabsViewModel(context = this, listInProgress))
+					
+					listTabs.set(0,RowTabsViewModel(context = this, listPending))
+					listTabs.set(1,RowTabsViewModel(context = this, listInProgress))
 					if (Utils.isInternetConnected(application)) {
 						
 						viewModel.user?.let { user ->
@@ -166,9 +181,10 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					it.fetchFilesResponseModel.forEach { file ->
 						listClose.add(RowFilesViewModel(this, file, this))
 					}
+					listClose.sortByDescending { (it as RowFilesViewModel).challanFileModel.createdDate }
 					
-					listTabs.add(RowTabsViewModel(context = this, listClose))
-					setViewPagerData()
+					listTabs.set(2,RowTabsViewModel(context = this, listClose))
+					binding.viewPager.adapter?.notifyDataSetChanged()
 				}
 				
 				is RetrofitRepository.RequestType.DEFAULT -> {
@@ -208,6 +224,8 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				
 			}
 		}.attach()
+		
+		
 	}
 	/*override fun onCreateOptionsMenu(menu: Menu): Boolean {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -298,6 +316,20 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		super.onResume()
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_FILES
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_BINNING_FILES
+		
+		
+		binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+			override fun onPageSelected(position: Int) {
+				lastTabSelected = position
+			}
+		})
+		
+		Handler(mainLooper).postDelayed( object : Runnable{
+			override fun run() {
+				binding.viewPager.setCurrentItem(lastTabSelected, false)
+			}
+			
+		},500)
 		
 	}
 	
