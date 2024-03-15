@@ -41,6 +41,29 @@ class LoginActivity : AppCompatActivity() {
 		binding.lifecycleOwner = this
 		RetrofitRepository.instance.apiLiveData.value = RetrofitRepository.RequestType.DEFAULT
 		setObservers()
+		setAllListeners()
+		
+	}
+	
+	private fun setAllListeners() {
+		onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+			override fun handleOnBackPressed() {
+				if (!viewModel.isLogin.value!!) {
+					viewModel.isLogin.value = true
+				} else {
+					finish()
+				}
+			}
+		})
+		
+		
+		binding.ivBack.setOnClickListener {
+			viewModel.isLogin.value = true
+			
+		}
+		binding.ivClose.setOnClickListener {
+			finish()
+		}
 		
 	}
 	
@@ -93,24 +116,7 @@ class LoginActivity : AppCompatActivity() {
 			}
 		}
 		
-		onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-			override fun handleOnBackPressed() {
-				if (!viewModel.isLogin.value!!) {
-					viewModel.isLogin.value = true
-				} else {
-					finish()
-				}
-			}
-		})
 		
-		
-		binding.ivBack.setOnClickListener {
-			viewModel.isLogin.value = true
-			
-		}
-		binding.ivClose.setOnClickListener {
-			finish()
-		}
 		
 		//Login Screen Events Observers
 		viewModel.events.observe(this) {
@@ -231,6 +237,10 @@ class LoginActivity : AppCompatActivity() {
 						viewModel.mobileNumber.value = ""
 						viewModel.pin.value = ""
 						viewModel.confirmPin.value = ""
+						binding.etUserName.clearFocus()
+						binding.etMobileNumber.clearFocus()
+						binding.etPin.clearFocus()
+						binding.etConfirmPin.clearFocus()
 					} else {
 						Toast.makeText(this, it.baseResponseModel.errorMsg, Toast.LENGTH_LONG)
 							.show()
