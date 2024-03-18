@@ -34,4 +34,5 @@
     <string name="scan_next">Scan Next</string>
     <string name="confirm_pin">Confirm PIN</string>
     <string name="list_of_challans_scanned_total">List of Challans ( Scanned : %1$s / Total : %2$s)</string>
+    <string name="search_by_file_name">Search by File Name</string>
 </resources>

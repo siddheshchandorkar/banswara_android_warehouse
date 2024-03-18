@@ -10,7 +10,7 @@
 
         <variable
             name="vm"
-            type="com.banswara.warehouse.dashboard.RowTabsViewModel" />
+            type="com.banswara.warehouse.dashboard.RowFragmentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,7 @@
                 android:textSize="16sp"
                 android:maxLength="11"
                 app:textwatcher="@{vm.textWatcher}"
-                android:text="@{vm.searchText}"
+                android:text="@={vm.searchText}"
                 android:fontFamily="@font/font_regular"
                 android:maxLines="1" />
 

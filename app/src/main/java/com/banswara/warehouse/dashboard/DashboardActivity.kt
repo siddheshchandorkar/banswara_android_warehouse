@@ -24,6 +24,7 @@ import com.banswara.warehouse.network.RetrofitRepository
 import com.banswara.warehouse.utils.PreferenceManager
 import com.banswara.warehouse.utils.RecyclerViewBindingAdapter
 import com.banswara.warehouse.utils.Utils
+import com.banswara.warehouse.utils.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +39,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 	private lateinit var viewModel: DashboardViewModel
 	private lateinit var binding: ActivityDashboardBinding
 	val listTabs = arrayListOf<BaseRowModel>()
+	val listOfList = arrayListOf<ArrayList<ChallanFileModel>>()
 	var lastTabSelected = 0
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +73,10 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		listTabs.add(RowTabsViewModel(context = this, arrayListOf<BaseRowModel>()))
 		listTabs.add(RowTabsViewModel(context = this, arrayListOf<BaseRowModel>()))
 		listTabs.add(RowTabsViewModel(context = this, arrayListOf<BaseRowModel>()))
+		
+		listOfList.add( ArrayList<ChallanFileModel>())
+		listOfList.add( ArrayList<ChallanFileModel>())
+		listOfList.add( ArrayList<ChallanFileModel>())
 		
 		setViewPagerData()
 		
@@ -129,7 +135,9 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 //					listTabs.clear()
 					viewModel.isApiCalling.value = false
 					val list = arrayListOf<BaseRowModel>()
+					val listPendingData = arrayListOf<ChallanFileModel>()
 					val listPending = arrayListOf<BaseRowModel>()
+					val listInProgressData = arrayListOf<ChallanFileModel>()
 					val listInProgress = arrayListOf<BaseRowModel>()
 					
 					
@@ -142,9 +150,11 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 						}*/
 						if (file.status.equals("InProgress")) {
 							listInProgress.add(RowFilesViewModel(this, file, this))
+							listInProgressData.add(file)
 						}
 						if (file.status.equals("Pending")) {
 							listPending.add(RowFilesViewModel(this, file, this))
+							listPendingData.add(file)
 						}
 						CoroutineScope(Dispatchers.IO).launch {
 							Log.d(
@@ -158,9 +168,14 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					listPending.sortByDescending { (it as RowFilesViewModel).challanFileModel.createdDate }
 					listInProgress.sortByDescending { (it as RowFilesViewModel).challanFileModel.createdDate }
 					
+					listPendingData.sortByDescending { it.createdDate }
+					listInProgressData.sortByDescending { it.createdDate }
 					
-					listTabs.set(0,RowTabsViewModel(context = this, listPending))
+					
+					listTabs.set(0,RowTabsViewModel(context = this, listPending, true))
 					listTabs.set(1,RowTabsViewModel(context = this, listInProgress))
+					listOfList.set(0,listPendingData)
+					listOfList.set(1,listInProgressData)
 					if (Utils.isInternetConnected(application)) {
 						
 						viewModel.user?.let { user ->
@@ -176,14 +191,18 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					
 				}
 				
-				is RetrofitRepository.RequestType.FETCH_CLOSE_FILES -> {
+			   	is RetrofitRepository.RequestType.FETCH_CLOSE_FILES -> {
 					val listClose = arrayListOf<BaseRowModel>()
+					val listCloseData = arrayListOf<ChallanFileModel>()
 					it.fetchFilesResponseModel.forEach { file ->
 						listClose.add(RowFilesViewModel(this, file, this))
+						listCloseData.add(file)
 					}
 					listClose.sortByDescending { (it as RowFilesViewModel).challanFileModel.createdDate }
+					listCloseData.sortByDescending { it.createdDate }
 					
-					listTabs.set(2,RowTabsViewModel(context = this, listClose))
+					listTabs.set(2,RowTabsViewModel(context = this, listClose, true))
+					listOfList.set(2,listCloseData)
 					binding.viewPager.adapter?.notifyDataSetChanged()
 				}
 				
@@ -205,8 +224,10 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 	
 	private fun setViewPagerData() {
 		viewModel.tabsLiveData.value = (listTabs)
+		val adapter = ViewPagerAdapter(supportFragmentManager, lifecycle, listOfList, this)
+		binding.viewPager.adapter = adapter
 		
-		binding.viewPager.setAdapter(RecyclerViewBindingAdapter(viewModel.tabsLiveData.value!!))
+//		binding.viewPager.setAdapter(RecyclerViewBindingAdapter(viewModel.tabsLiveData.value!!))
 		
 		TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
 			when (position) {
@@ -316,7 +337,6 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		super.onResume()
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_FILES
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_BINNING_FILES
-		
 		
 		binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 			override fun onPageSelected(position: Int) {

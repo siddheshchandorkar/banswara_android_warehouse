@@ -195,6 +195,34 @@ class RetrofitRepository {
 			})
 	}
 	
+	suspend fun fetchDispatchFileDetails(useId: Int, deviceId: String, fileName: String) {
+		
+		retrofitService.readDispatchFileData(ReadFileDataRequestModel(useId, deviceId, fileName))
+			.enqueue(object : Callback<List<FileContentModel>> {
+				
+				override fun onResponse(
+					call: Call<List<FileContentModel>>,
+					response: Response<List<FileContentModel>>
+				) {
+					try {
+						response.body()?.let {
+							apiLiveData.value = RequestType.FETCH_FILE_CONTENT(it)
+						}
+					} catch (t: Throwable) {
+						//set null list in case of crash
+						apiLiveData.value = null
+						t.printStackTrace()
+					}
+				}
+				
+				override fun onFailure(call: Call<List<FileContentModel>>, t: Throwable) {
+					//set null list in case of failure
+					apiLiveData.value = null
+					t.printStackTrace()
+				}
+			})
+	}
+	
 	suspend fun dispatchScannedFile(useId: Int, deviceId: String, fileName: String, list :ArrayList<BinningChallanModel>) {
 		
 		retrofitService.dispatchFile(DispatchFileRequestModel(userId = useId,deviceId= deviceId, fileName =  fileName, challanList = list))

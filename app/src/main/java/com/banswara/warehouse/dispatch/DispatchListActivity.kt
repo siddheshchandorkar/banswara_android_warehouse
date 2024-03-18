@@ -153,11 +153,20 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 					if (Utils.isInternetConnected(application)) {
 						CoroutineScope(Dispatchers.IO).launch {
 							viewModel.isApiCalling.postValue(true)
-							RetrofitRepository.instance.fetchContent(
-								viewModel.user!!.userId,
-								Utils.getDeviceId(contentResolver),
-								viewModel.fileName.value!!
-							)
+							if(viewModel.close.value ==true){
+								RetrofitRepository.instance.fetchDispatchFileDetails(
+									viewModel.user!!.userId,
+									Utils.getDeviceId(contentResolver),
+									viewModel.fileName.value!!
+								)
+							}else{
+								RetrofitRepository.instance.fetchContent(
+									viewModel.user!!.userId,
+									Utils.getDeviceId(contentResolver),
+									viewModel.fileName.value!!
+								)
+							}
+							
 						}
 					}
 					

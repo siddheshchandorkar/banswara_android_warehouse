@@ -45,18 +45,6 @@ class DashboardViewModel(val app: Application) : AndroidViewModel(app) {
 	
 	fun dispatchClick(view: View) {
 		isDispatch.value = true
-		/*fileListLiveData.value?.let {
-			if (it.isNotEmpty()) {
-				title.value = "Dispatch Process"
-				isDispatch.value = true
-			}else{
-				Toast.makeText(app, "Please Complete atleast 1 Binning process", Toast.LENGTH_SHORT).show()
-			}
-		}?:run {
-			Toast.makeText(app, "Please Complete atleast 1 Binning process", Toast.LENGTH_SHORT).show()
-		}*/
-		
-		
 	}
 	
 	sealed class DASHBOARD_EVENTS {

@@ -1,13 +1,16 @@
 package com.banswara.warehouse.model
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.banswara.warehouse.utils.StatusRetention
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 //@Entity(tableName = "file_master", primaryKeys = arrayOf("id", "file_name"))
+@Parcelize
 @Entity(tableName = "file_master")
 data class ChallanFileModel(
 	
@@ -36,7 +39,7 @@ data class ChallanFileModel(
 	@SerializedName("vErrorMsg")
 	var errorMsg: String = ""
 	
-	) {
+	) : Parcelable {
 	override fun toString(): String {
 		return fileName
 	}

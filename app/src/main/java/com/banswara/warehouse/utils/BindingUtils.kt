@@ -1,9 +1,10 @@
 package com.banswara.warehouse.utils
 
+import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toolbar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.banswara.warehouse.model.BaseRowModel
@@ -17,7 +18,8 @@ class BindingUtils {
         private const val ERROR = "error"
         private const val TEXT = "text"
         private const val ON_CLICK = "onClick"
-
+        const val SET_TEXT_WATCHER = "textwatcher"
+        
         @JvmStatic
         @BindingAdapter(ROW_DATA)
         fun setRowLayoutData(recyclerView: RecyclerView, listData: ArrayList<BaseRowModel>) {
@@ -54,6 +56,15 @@ class BindingUtils {
         @BindingAdapter(TITLE)
         fun bindTitle(editText: Toolbar, text: String?) {
             editText.title = text?:""
+        }
+        
+        @JvmStatic
+        @BindingAdapter(SET_TEXT_WATCHER)
+        fun bindTextWatcher(
+            textView: TextView,
+            textWatcher: TextWatcher?
+        ) {
+            if (textWatcher != null) textView.addTextChangedListener(textWatcher)
         }
 
     }

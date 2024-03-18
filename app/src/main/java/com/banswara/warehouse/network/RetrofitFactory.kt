@@ -19,10 +19,7 @@ import javax.net.ssl.X509TrustManager
 */
 object RetrofitFactory {
 	
-//	private const val BASE_URL = "https://a8f330ca-466d-4fe5-86bf-ce1cff788cb4.mock.pstmn.io" //TODO Siddhesh this is mock server url
-//	private const val BASE_URL = "https://1187461a-eb7c-45eb-8d6c-ae472c3a64de.mock.pstmn.io" //TODO Siddhesh this is mock server url
-//	private const val BASE_URL = "https://9d826a18-c475-4e8b-8611-5d96c30bde6d.mock.pstmn.io" //TODO Siddhesh this is mock server url
-	private const val BASE_URL = "https://103.67.180.170:8021"
+ 	private const val BASE_URL = "https://103.67.180.170:8021"
 	fun makeRetrofitService(): RetrofitService {
 		val interceptor = HttpLoggingInterceptor()
 		interceptor.level = HttpLoggingInterceptor.Level.BODY
