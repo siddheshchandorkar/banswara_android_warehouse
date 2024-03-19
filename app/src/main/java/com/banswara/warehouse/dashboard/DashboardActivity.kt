@@ -133,22 +133,17 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 			viewModel.isApiCalling.postValue(false)
 			when (it) {
 				is RetrofitRepository.RequestType.FETCH_FILES -> {
-//					listTabs.clear()
-					viewModel.isApiCalling.value = false
-					val list = arrayListOf<BaseRowModel>()
+ 					viewModel.isApiCalling.value = false
+ 					
 					val listPendingData = arrayListOf<ChallanFileModel>()
 					val listPending = arrayListOf<BaseRowModel>()
+					
 					val listInProgressData = arrayListOf<ChallanFileModel>()
 					val listInProgress = arrayListOf<BaseRowModel>()
 					
 					
 					it.fetchFilesResponseModel.forEach { file ->
 						
-						list.add(RowFilesViewModel(this, file, this))
-						
-						/*if(file.status.equals("Closed")){
-							listClose.add(RowFilesViewModel(this,file, this))
-						}*/
 						if (file.status.equals("InProgress")) {
 							listInProgress.add(RowFilesViewModel(this, file, this))
 							listInProgressData.add(file)
@@ -204,7 +199,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 					
 					listTabs.set(2,RowTabsViewModel(context = this, listClose, true))
 					listOfList.set(2,listCloseData)
-					binding.viewPager.adapter?.notifyDataSetChanged()
+				    setViewPagerData()
 				}
 				
 				is RetrofitRepository.RequestType.DEFAULT -> {
@@ -227,8 +222,6 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		viewModel.tabsLiveData.value = (listTabs)
 		val adapter = ViewPagerAdapter(supportFragmentManager, lifecycle, listOfList, this)
 		binding.viewPager.adapter = adapter
-		
-//		binding.viewPager.setAdapter(RecyclerViewBindingAdapter(viewModel.tabsLiveData.value!!))
 		
 		TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
 			when (position) {
