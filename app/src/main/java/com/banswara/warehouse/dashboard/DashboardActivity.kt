@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -248,11 +249,11 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		
 		
 	}
-	/*override fun onCreateOptionsMenu(menu: Menu): Boolean {
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		menuInflater.inflate(R.menu.logout, menu)
 		return true
-	}*/
+	}
 	
 	
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -261,8 +262,11 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				backFlowHandle()
 			}
 			
-			R.id.logout -> {
+			/*R.id.logout -> {
 				confirmLogout()
+			}*/
+			R.id.refresh -> {
+				onResume()
 			}
 			
 		}

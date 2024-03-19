@@ -3,10 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/refresh"
+        android:contentDescription="@string/refresh_list"
+        android:enabled="true"
+        app:showAsAction="always"
+        android:title="@string/refresh_list" />
+   <!-- <item
         android:id="@+id/logout"
         android:contentDescription="@string/logout"
         android:enabled="true"
         app:showAsAction="never"
-        android:title="@string/logout" />
+        android:title="@string/logout" />-->
 
 </menu>

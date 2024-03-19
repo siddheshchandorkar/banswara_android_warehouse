@@ -155,7 +155,6 @@ class DispatchListActivity : AppCompatActivity(), RowChallanViewModel.ChallanCli
 							viewModel.isApiCalling.postValue(true)
 							if(viewModel.close.value ==true){
 								RetrofitRepository.instance.fetchDispatchFileDetails(
-									viewModel.user!!.userId,
 									Utils.getDeviceId(contentResolver),
 									viewModel.fileName.value!!
 								)
