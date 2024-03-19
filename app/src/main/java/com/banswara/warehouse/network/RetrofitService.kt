@@ -32,7 +32,7 @@ interface RetrofitService {
 	@POST("/Api/AppApi/Fn_Read_Text_File")
 	fun readFileData(@Body readFileDataRequestModel: ReadFileDataRequestModel): Call<List<FileContentModel>>
 	
-	@POST("/api/AppApi/Fn_Get_Dispatch_ChallanList")
+	@POST("/api/AppApi/Fn_Read_Close_Text_File")
 	fun readDispatchFileData(@Body readFileDataRequestModel: ReadClosedFileDataRequestModel): Call<List<FileContentModel>>
 	
 	//Dispatch api

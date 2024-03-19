@@ -195,9 +195,9 @@ class RetrofitRepository {
 			})
 	}
 	
-	suspend fun fetchDispatchFileDetails( deviceId: String, fileName: String) {
+	suspend fun fetchDispatchFileDetails(fileName: String) {
 		
-		retrofitService.readDispatchFileData(ReadClosedFileDataRequestModel( deviceId, fileName))
+		retrofitService.readDispatchFileData(ReadClosedFileDataRequestModel( fileName))
 			.enqueue(object : Callback<List<FileContentModel>> {
 				
 				override fun onResponse(

@@ -239,6 +239,12 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 				
 			}
 		}.attach()
+		binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+			override fun onPageSelected(position: Int) {
+				lastTabSelected = position
+			}
+		})
+		binding.viewPager.setCurrentItem(lastTabSelected, false)
 		
 		
 	}
@@ -335,18 +341,7 @@ class DashboardActivity : AppCompatActivity(), RowFilesViewModel.FileClick,
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_FILES
 		viewModel.events.value = DashboardViewModel.DASHBOARD_EVENTS.FETCH_BINNING_FILES
 		
-		binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-			override fun onPageSelected(position: Int) {
-				lastTabSelected = position
-			}
-		})
 		
-		Handler(mainLooper).postDelayed( object : Runnable{
-			override fun run() {
-				binding.viewPager.setCurrentItem(lastTabSelected, false)
-			}
-			
-		},500)
 		
 	}
 	
